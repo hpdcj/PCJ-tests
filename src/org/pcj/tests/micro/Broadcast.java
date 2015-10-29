@@ -17,9 +17,12 @@ public class Broadcast extends Storage implements StartPoint {
     @Override
     public void main() {
 
-        int[] transmit = {1, 10, 100, 1024, 2048, 4096, 8192,
-            16348, 32768, 65536, 131072, 262144, 524288,
-            1048576};
+        int[] transmit
+                = {
+                    1, 10, 100, 1024, 2048, 4096, 8192, 16384,
+                    32768, 65536, 131072, 262144, 524288, 1048576, 2097152,
+                    4194304, //8388608, //16777216,
+                };
 
         for (int n : transmit) {
             PCJ.barrier();
@@ -34,7 +37,7 @@ public class Broadcast extends Storage implements StartPoint {
 
             int ntimes = 100;
 
-            double time = System.nanoTime();
+            long time = System.nanoTime();
 
             for (int i = 0; i < ntimes; i++) {
                 if (PCJ.myId() == 0) {
@@ -45,12 +48,12 @@ public class Broadcast extends Storage implements StartPoint {
             }
 
             time = System.nanoTime() - time;
-            time = (time / (double) ntimes) * 1e-9;
+            double dtime = (time / (double) ntimes) * 1e-9;
             PCJ.barrier();
 
             if (PCJ.myId() == 0) {
-                System.out.format(Locale.FRANCE, "%5d\tsize %10f\ttime %7f %n",
-                        PCJ.threadCount(), (double) n / 128, time);
+                System.out.format(Locale.FRANCE, "%5d\tsize %12.7f\ttime %12.7f%n",
+                        PCJ.threadCount(), (double) n * 8 / 1024, dtime);
             }
         }
     }

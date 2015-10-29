@@ -4,7 +4,7 @@
  */
 package org.pcj.tests.app.moldyn;
 
-import jgfutil.JGFInstrumentor;
+import java.util.Locale;
 import org.pcj.PCJ;
 
 /**
@@ -32,7 +32,7 @@ public class MolDynBench extends MolDyn {
             PCJ.monitor("r_epot");
             PCJ.monitor("r_vir");
             PCJ.monitor("r_interactions");
-            
+
             PCJ.monitor("tmp_xforce");
             PCJ.monitor("tmp_yforce");
             PCJ.monitor("tmp_zforce");
@@ -45,18 +45,7 @@ public class MolDynBench extends MolDyn {
     }
 
     public void JGFapplication() {
-
-        PCJ.barrier();
-        if (PCJ.myId() == 0) {
-            JGFInstrumentor.startTimer("Section3:MolDyn:Run");
-        }
-
         runiters(PCJ.myId(), PCJ.threadCount());
-
-        PCJ.barrier();
-        if (PCJ.myId() == 0) {
-            JGFInstrumentor.stopTimer("Section3:MolDyn:Run");
-        }
     }
 
     public void JGFvalidate() {
@@ -64,8 +53,8 @@ public class MolDynBench extends MolDyn {
             13774.625810229074, 46548.77475182352};
         double dev = Math.abs(ek - refval[size]);
         if (dev > 1.0e-8) {
-            System.out.println("Validation failed");
-            System.out.println("Kinetic Energy = " + ek + "  " + dev + "  " + size);
+            System.err.println("Validation failed");
+            System.err.println("Kinetic Energy = " + ek + "  " + dev + "  " + size);
         }
     }
 
@@ -75,33 +64,25 @@ public class MolDynBench extends MolDyn {
     }
 
     public void JGFrun(int size) {
-        if (PCJ.myId() == 0) {
-            JGFInstrumentor.addTimer("Section3:MolDyn:Total", "Solutions", size);
-            JGFInstrumentor.addTimer("Section3:MolDyn:Run", "Interactions", size);
-        }
-
         JGFsetsize(size);
 
-        if (PCJ.myId() == 0) {
-            JGFInstrumentor.startTimer("Section3:MolDyn:Total");
-        }
-
         JGFinitialise();
+
+        PCJ.barrier();
+        long time = System.nanoTime();
+
         JGFapplication();
+        PCJ.barrier();
+
+        time = System.nanoTime() - time;
+        double dtime = time * 1e-9;
+
         if (PCJ.myId() == 0) {
             JGFvalidate();
+
+            System.out.format(Locale.FRANCE, "%5d\ttime %12.7f%n",
+                    PCJ.threadCount(), dtime);
         }
         JGFtidyup();
-
-        if (PCJ.myId() == 0) {
-            JGFInstrumentor.stopTimer("Section3:MolDyn:Total");
-
-            JGFInstrumentor.addOpsToTimer("Section3:MolDyn:Run", (double) interactions);
-            JGFInstrumentor.addOpsToTimer("Section3:MolDyn:Total", 1);
-
-            JGFInstrumentor.printTimer("Section3:MolDyn:Run");
-            JGFInstrumentor.printTimer("Section3:MolDyn:Total");
-        }
-
     }
 }

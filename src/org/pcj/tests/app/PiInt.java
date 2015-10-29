@@ -1,5 +1,6 @@
 package org.pcj.tests.app;
 
+import java.util.Locale;
 import org.pcj.FutureObject;
 import org.pcj.PCJ;
 import org.pcj.Shared;
@@ -23,15 +24,27 @@ public class PiInt extends Storage implements StartPoint {
     @SuppressWarnings("method")
     @Override
     public void main() throws Throwable {
+        int ntimes = 1_000;
+        int points = 1_000_000;
+
         double pi = 0.0;
+
         long time = System.currentTimeMillis();
-        for (int i = 1; i < 1000; ++i) {
-            pi = calc(1000000);
+
+        for (int i = 1; i < ntimes; ++i) {
+            PCJ.barrier();
+
+            pi = calc(points);
         }
+
         time = System.currentTimeMillis() - time;
+        double dtime = time * 1e-9;
+
         if (PCJ.myId() == 0) {
-            double err = pi - Math.PI;
-            PCJ.log(String.format("time %d\tsum, err = %7.5f, %10e\n", time, pi, err));
+            validate(pi);
+
+            System.out.format(Locale.FRANCE, "%5d\ttime %12.7f%n",
+                    PCJ.threadCount(), dtime);
         }
     }
 
@@ -58,7 +71,17 @@ public class PiInt extends Storage implements StartPoint {
 
             return sum;
         } else {
-            return 0;
+            return Double.NaN;
+        }
+    }
+
+    private void validate(double pi) {
+        double refval = Math.PI;
+        double dev = Math.abs(pi - refval);
+
+        if (dev > 1.0e-4) {
+            System.err.println("Validation failed");
+            System.err.println("Value = " + pi + "  " + dev);
         }
     }
 }

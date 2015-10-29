@@ -11,16 +11,15 @@ import org.pcj.PCJ;
  */
 public class MainWithDeploy {
 
-
     public static void main(String[] args) throws Throwable {
         if (args.length == 0) {
             System.out.println("<start point> [conf file] [num nodes]");
 //            args = new String[]{"EasyTest"};
-            args = new String[]{"Barrier"};
+//            args = new String[]{"Barrier"};
 //            args = new String[]{"Broadcast"};
 //            args = new String[]{"PingPong"};
 //            args = new String[]{"PiInt"};
-//            args = new String[]{"PiMC"};
+            args = new String[]{"PiMC"};
 //            args = new String[]{"RayTracerA"};
 //            args = new String[]{"RayTracerB"};
 //            args = new String[]{"RayTracerC"};

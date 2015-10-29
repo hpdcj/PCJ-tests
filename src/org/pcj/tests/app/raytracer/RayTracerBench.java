@@ -4,7 +4,7 @@
  */
 package org.pcj.tests.app.raytracer;
 
-import jgfutil.JGFInstrumentor;
+import java.util.Locale;
 import org.pcj.PCJ;
 
 /**
@@ -12,7 +12,7 @@ import org.pcj.PCJ;
  * @author faramir
  */
 public class RayTracerBench {
-    
+
     Scene scene;
     /**
      * Lights for the rendering scene
@@ -35,8 +35,7 @@ public class RayTracerBench {
      */
     static final int alpha = 255 << 24;
     /**
-     * Null vector (for speedup, instead of
-     * <code>new Vec(0,0,0)</code>
+     * Null vector (for speedup, instead of <code>new Vec(0,0,0)</code>
      */
     static final Vec voidVec = new Vec();
     /**
@@ -66,8 +65,7 @@ public class RayTracerBench {
     int numobjects;
 
     /**
-     * Create and initialize the scene for the rendering
-     * picture.
+     * Create and initialize the scene for the rendering picture.
      *
      * @return The scene just created
      */
@@ -273,64 +271,6 @@ public class RayTracerBench {
                 }
             }
         }
-
-//        if (PCJ.myId() == 0) {
-//            int iwidth = interval.width;
-//            int iheight = interval.yto - interval.yfrom;
-//            BufferedImage image = new BufferedImage(iwidth, iheight, BufferedImage.TYPE_INT_ARGB);
-////            Graphics2D g = image.createGraphics();
-////            g.setColor(Color.WHITE);
-////            g.fillRect(0, 0, image.getWidth(), image.getHeight());
-////            g.dispose();
-//            for (int iy = 0; iy < iheight; ++iy) {
-//                for (int ix = 0; ix < iwidth; ++ix) {
-//                    image.setRGB(ix, iy, row[iy * interval.width + ix]);
-//                }
-//            }
-//
-////            File outputfile = new File("saved.png");
-////            try {
-////                ImageIO.write(image, "png", outputfile);
-////            } catch (IOException ex) {
-////                Logger.getLogger(RayTracerBench.class.getName()).log(Level.SEVERE, null, ex);
-////            }
-//            
-//            JPanel bgPanel = new JPanel(new BorderLayout()) {
-//                {
-//                    setOpaque(false);
-//                }
-//
-//                protected void paintComponent(Graphics g) {
-//                    Rectangle r = g.getClipBounds();
-//                    // paint bg
-//                    int s = 10;
-//                    for (int y = r.y / s; y < r.y + r.height; y += s) {
-//                        int o = (y % (2 * s) == 0 ? s : 0);
-//                        for (int x = r.x / s + o; x < r.x + r.width; x += 2 * s) {
-//                            g.fillRect(x, y, s, s);
-//                        }
-//                    }
-//                    super.paintComponent(g);
-//                }
-//            };
-//
-//            bgPanel.add(new JLabel(new ImageIcon(image)) {
-//                {
-//                    setOpaque(false);
-//                }
-//            });
-//
-//            JFrame frame = new JFrame("Test");
-//            frame.add(bgPanel);
-//            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//            frame.setSize(350, 300);
-//            frame.setVisible(true);
-//        }
-
-//        else {
-//            MPI.COMM_WORLD.Send(p_row, 0, p_row.length, MPI.INT, 0, PCJ.myId());
-//        }
-        PCJ.barrier();
     }
 
     boolean intersect(Ray r, double maxt) {
@@ -357,8 +297,7 @@ public class RayTracerBench {
      * Checks if there is a shadow
      *
      * @param r The ray
-     * @return Returns 1 if there is a shadow, 0 if there
-     * isn't
+     * @return Returns 1 if there is a shadow, 0 if there isn't
      */
     int Shadow(Ray r, double tmax) {
         if (intersect(r, tmax)) {
@@ -498,10 +437,6 @@ public class RayTracerBench {
 
     public void JGFinitialise() {
 
-        if (PCJ.myId() == 0) {
-            JGFInstrumentor.startTimer("Section3:RayTracer:Init");
-        }
-
         // set image size
         width = height = datasizes[size];
         if (PCJ.myId() == 0) {
@@ -519,73 +454,45 @@ public class RayTracerBench {
         setScene(scene);
 
         numobjects = scene.getObjects();
-
-        if (PCJ.myId() == 0) {
-            JGFInstrumentor.stopTimer("Section3:RayTracer:Init");
-        }
-
     }
 
     public void JGFapplication() {
-
-        if (PCJ.myId() == 0) {
-            JGFInstrumentor.startTimer("Section3:RayTracer:Run");
-        }
-
         // Set interval to be rendered to the whole picture
         // (overkill, but will be useful to retain this for parallel versions)
         Interval interval = new Interval(0, width, height, 0, height, 1);
 
         // Do the business!
         render(interval);
-
-        if (PCJ.myId() == 0) {
-            JGFInstrumentor.stopTimer("Section3:RayTracer:Run");
-        }
-
     }
 
     public void JGFvalidate() {
         long refval[] = {2676692, 29827635, 119283198, 745422489L};
         long dev = checksum - refval[size];
         if (dev != 0) {
-            PCJ.log("Validation failed");
-            PCJ.log("Pixel checksum = " + checksum);
-            PCJ.log("Reference value = " + refval[size]);
+            System.err.println("Validation failed");
+            System.err.println("Pixel checksum = " + checksum);
+            System.err.println("Reference value = " + refval[size]);
         }
     }
 
     public void run(int size) {
         this.size = size;
 
-        if (PCJ.myId() == 0) {
-            JGFInstrumentor.addTimer("Section3:RayTracer:Total", "Solutions", size);
-            JGFInstrumentor.addTimer("Section3:RayTracer:Init", "Objects", size);
-            JGFInstrumentor.addTimer("Section3:RayTracer:Run", "Pixels", size);
-        }
-
-        if (PCJ.myId() == 0) {
-            JGFInstrumentor.startTimer("Section3:RayTracer:Total");
-        }
-
         JGFinitialise();
+
+        PCJ.barrier();
+        long time = System.nanoTime();
         JGFapplication();
+        PCJ.barrier();
+
+        time = System.nanoTime() - time;
+        double dtime = time * 1e-9;
 
         if (PCJ.myId() == 0) {
             JGFvalidate();
+
+            System.out.format(Locale.FRANCE, "%5d\ttime %12.7f%n",
+                    PCJ.threadCount(), dtime);
         }
-
-        if (PCJ.myId() == 0) {
-            JGFInstrumentor.stopTimer("Section3:RayTracer:Total");
-
-            JGFInstrumentor.addOpsToTimer("Section3:RayTracer:Init", (double) numobjects);
-            JGFInstrumentor.addOpsToTimer("Section3:RayTracer:Run", (double) (width * height));
-            JGFInstrumentor.addOpsToTimer("Section3:RayTracer:Total", 1);
-
-            JGFInstrumentor.printTimer("Section3:RayTracer:Init");
-            JGFInstrumentor.printTimer("Section3:RayTracer:Run");
-            JGFInstrumentor.printTimer("Section3:RayTracer:Total");
-        }
-
     }
 }

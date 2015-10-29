@@ -9,32 +9,31 @@ public class Barrier
 
     @Override
     public void main() {
-        int number_of_tests = 5;
-        int ntimes = 1000;
+        int number_of_tests = 10;
+        int ntimes = 10000;
 
         PCJ.barrier();
 
         double tmin = Double.MAX_VALUE;
         for (int k = 0; k < number_of_tests; k++) {
-            long rTime = System.nanoTime();
+            long time = System.nanoTime();
 
             for (int i = 0; i < ntimes; i++) {
                 PCJ.barrier();
             }
 
-            rTime = System.nanoTime() - rTime;
-            double t = (rTime / (double) ntimes) * 1e-9;
+            time = System.nanoTime() - time;
+            double dtime = (time / (double) ntimes) * 1e-9;
 
-            if (tmin > t) {
-                tmin = t;
+            if (tmin > dtime) {
+                tmin = dtime;
             }
 
             PCJ.barrier();
         }
 
         if (PCJ.myId() == 0) {
-            System.out.format(Locale.FRANCE,
-                    "%5d\ttime %7f%n",
+            System.out.format(Locale.FRANCE, "%5d\ttime %12.7f%n",
                     PCJ.threadCount(), tmin);
         }
     }
