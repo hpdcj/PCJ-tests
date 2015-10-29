@@ -4,7 +4,6 @@
  */
 package org.pcj.tests.app.moldyn;
 
-import java.util.Locale;
 import org.pcj.PCJ;
 
 /**
@@ -80,7 +79,7 @@ public class MolDynBench extends MolDyn {
         if (PCJ.myId() == 0) {
             JGFvalidate();
 
-            System.out.format(Locale.FRANCE, "MolDyn%d\n%5d\ttime %12.7f%n",
+            System.out.format("MolDyn%d\n%5d\ttime %12.7f%n",
                     size, PCJ.threadCount(), dtime);
         }
         JGFtidyup();

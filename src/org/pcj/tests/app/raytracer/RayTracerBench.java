@@ -4,7 +4,6 @@
  */
 package org.pcj.tests.app.raytracer;
 
-import java.util.Locale;
 import org.pcj.PCJ;
 
 /**
@@ -491,7 +490,7 @@ public class RayTracerBench {
         if (PCJ.myId() == 0) {
             JGFvalidate();
 
-            System.out.format(Locale.FRANCE, "RayTracer%d\t%5d\ttime %12.7f%n",
+            System.out.format("RayTracer%d\t%5d\ttime %12.7f%n",
                     size, PCJ.threadCount(), dtime);
         }
     }

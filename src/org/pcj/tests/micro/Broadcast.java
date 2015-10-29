@@ -3,7 +3,6 @@ package org.pcj.tests.micro;
 /*
  * @author Piotr
  */
-import java.util.Locale;
 import org.pcj.PCJ;
 import org.pcj.Shared;
 import org.pcj.StartPoint;
@@ -52,7 +51,7 @@ public class Broadcast extends Storage implements StartPoint {
             PCJ.barrier();
 
             if (PCJ.myId() == 0) {
-                System.out.format(Locale.FRANCE, "Broadcast\t%5d\tsize %12.7f\ttime %12.7f%n",
+                System.out.format("Broadcast\t%5d\tsize %12.7f\ttime %12.7f%n",
                         PCJ.threadCount(), (double) n * 8 / 1024, dtime);
             }
         }

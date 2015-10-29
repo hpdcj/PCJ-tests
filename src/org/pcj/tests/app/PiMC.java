@@ -1,6 +1,5 @@
 package org.pcj.tests.app;
 
-import java.util.Locale;
 import java.util.Random;
 import org.pcj.FutureObject;
 import org.pcj.PCJ;
@@ -55,7 +54,7 @@ public class PiMC extends Storage implements StartPoint {
         if (PCJ.myId() == 0) {
             validate(pi);
 
-            System.out.format(Locale.FRANCE, "PiMC\t%5d\ttime %12.7f%n",
+            System.out.format("PiMC\t%5d\ttime %12.7f%n",
                     PCJ.threadCount(), dtime);
         }
     }

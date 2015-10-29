@@ -3,7 +3,6 @@ package org.pcj.tests.micro;
 /*
  * @author Piotr
  */
-import java.util.Locale;
 import org.pcj.Group;
 import org.pcj.PCJ;
 import org.pcj.Shared;
@@ -130,7 +129,7 @@ public class PingPong extends Storage implements StartPoint {
             }
 
             if (g.myId() == 0) {
-                System.out.format(Locale.FRANCE, "PingPong\t%5d\tsize %12.7f\tt_get %12.7f\tt_put %12.7f\tt_putB %12.7f%n",
+                System.out.format("PingPong\t%5d\tsize %12.7f\tt_get %12.7f\tt_put %12.7f\tt_putB %12.7f%n",
                         g.threadCount(), (double) n / 128, tmin_get, tmin_put, tmin_putB);
             }
 
