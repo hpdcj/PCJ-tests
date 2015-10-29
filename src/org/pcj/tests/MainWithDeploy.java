@@ -17,9 +17,9 @@ public class MainWithDeploy {
 //            args = new String[]{"EasyTest"};
 //            args = new String[]{"Barrier"};
 //            args = new String[]{"Broadcast"};
-//            args = new String[]{"PingPong"};
+            args = new String[]{"PingPong"};
 //            args = new String[]{"PiInt"};
-            args = new String[]{"PiMC"};
+//            args = new String[]{"PiMC"};
 //            args = new String[]{"RayTracerA"};
 //            args = new String[]{"RayTracerB"};
 //            args = new String[]{"RayTracerC"};

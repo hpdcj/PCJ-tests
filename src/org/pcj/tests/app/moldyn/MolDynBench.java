@@ -80,8 +80,8 @@ public class MolDynBench extends MolDyn {
         if (PCJ.myId() == 0) {
             JGFvalidate();
 
-            System.out.format(Locale.FRANCE, "%5d\ttime %12.7f%n",
-                    PCJ.threadCount(), dtime);
+            System.out.format(Locale.FRANCE, "MolDyn%d\n%5d\ttime %12.7f%n",
+                    size, PCJ.threadCount(), dtime);
         }
         JGFtidyup();
     }

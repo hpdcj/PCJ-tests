@@ -33,7 +33,7 @@ public class Barrier
         }
 
         if (PCJ.myId() == 0) {
-            System.out.format(Locale.FRANCE, "%5d\ttime %12.7f%n",
+            System.out.format(Locale.FRANCE, "Barrier\t%5d\ttime %12.7f%n",
                     PCJ.threadCount(), tmin);
         }
     }

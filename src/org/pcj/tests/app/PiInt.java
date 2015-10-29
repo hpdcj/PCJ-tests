@@ -43,7 +43,7 @@ public class PiInt extends Storage implements StartPoint {
         if (PCJ.myId() == 0) {
             validate(pi);
 
-            System.out.format(Locale.FRANCE, "%5d\ttime %12.7f%n",
+            System.out.format(Locale.FRANCE, "PiInt\t%5d\ttime %12.7f%n",
                     PCJ.threadCount(), dtime);
         }
     }
