@@ -14,7 +14,7 @@ public class Main {
 
     public static void main(String[] args) throws Throwable {
         if (args.length == 0) {
-            System.out.println("<start point> [conf file] [num nodes]");
+            System.out.println("<start point> [nodes file] [num nodes]");
             System.exit(1);
         }
 

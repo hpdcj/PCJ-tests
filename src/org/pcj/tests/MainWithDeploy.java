@@ -13,12 +13,12 @@ public class MainWithDeploy {
 
     public static void main(String[] args) throws Throwable {
         if (args.length == 0) {
-            System.out.println("<start point> [conf file] [num nodes]");
+            System.out.println("<start point> [nodes file] [num nodes]");
 //            args = new String[]{"EasyTest"};
 //            args = new String[]{"Barrier"};
 //            args = new String[]{"Broadcast"};
 //            args = new String[]{"PingPong"};
-            args = new String[]{"PiInt"};
+//            args = new String[]{"PiInt"};
 //            args = new String[]{"PiMC"};
 //            args = new String[]{"RayTracerA"};
 //            args = new String[]{"RayTracerB"};
@@ -28,7 +28,7 @@ public class MainWithDeploy {
 //            args = new String[]{"MolDynB"};
 //            args = new String[]{"MolDynC"};
 //            args = new String[]{"MolDynD"};
-//            System.exit(1);
+            System.exit(1);
         }
 
         MainArgs mainArgs = new MainArgs(args);

@@ -10,7 +10,7 @@ package org.pcj.tests.app.moldyn;
  * @author faramir
  */
 public class Particle {
-    private MolDyn md;
+    private final MolDynBench md;
     public double xcoord;
     public double ycoord;
     public double zcoord;
@@ -21,7 +21,7 @@ public class Particle {
     public double yforce;
     public double zforce;
 
-    public Particle(MolDyn md, double xcoord, double ycoord, double zcoord, double xvelocity, double yvelocity, double zvelocity, double xforce, double yforce, double zforce) {
+    public Particle(MolDynBench md, double xcoord, double ycoord, double zcoord, double xvelocity, double yvelocity, double zvelocity, double xforce, double yforce, double zforce) {
         this.md = md;
         this.xcoord = xcoord;
         this.ycoord = ycoord;

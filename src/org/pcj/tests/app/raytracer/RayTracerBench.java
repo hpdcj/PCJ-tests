@@ -490,8 +490,8 @@ public class RayTracerBench {
         if (PCJ.myId() == 0) {
             JGFvalidate();
 
-            System.out.format("RayTracer%d\t%5d\ttime %12.7f%n",
-                    size, PCJ.threadCount(), dtime);
+            System.out.format("RayTracer[%d]\t%5d\ttime %12.7f%n",
+                    datasizes[size], PCJ.threadCount(), dtime);
         }
     }
 }
