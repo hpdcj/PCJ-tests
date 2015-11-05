@@ -4,8 +4,8 @@
 # #SBATCH -n 28
 # #SBATCH --mem 18000
 # #SBATCH --time=24:00:00
-# #SBATCH --output="output/barrier-java9_%j.out"
-# #SBATCH --error="output/barrier-jav9_%j.err"
+# #SBATCH --output="PCJ-tests_%j.out"
+# #SBATCH --error="PCJ-tests_%j.err"
 
 timer=`date +%s`
 
@@ -76,6 +76,10 @@ head -1 all_nodes.uniq > nodes.uniq
 cat nodes.uniq nodes.uniq > nodes.txt
 mpiexec --hostfile nodes.uniq bash -c "java -Xmx16g -cp .:PCJ-ant.jar:PCJ-tests.jar org.pcj.tests.Main PingPong nodes.txt" | tee -a pingpong_1n2t.out
 
+# --- PROCESS RESULT ---
+log "Processing results"
+
+python process_results.py
 
 # --- COMPLETED ---
 timer=$(( `date +%s` - $timer ))
