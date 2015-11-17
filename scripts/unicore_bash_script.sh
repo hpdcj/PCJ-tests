@@ -20,6 +20,8 @@ log "Master host: `/bin/hostname`"
 log "Working directory: `pwd`"
 log "Environment variables: `env`"
 log "Set variables: `set`"
+log "CPU info: `cat /proc/cpuinfo`"
+log "MEM info: `cat /proc/meminfo`"
 
 
 # --- LOADING MODULES ---

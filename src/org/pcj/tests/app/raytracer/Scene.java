@@ -20,70 +20,57 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-
-
 package org.pcj.tests.app.raytracer;
-
 
 import java.util.Vector;
 
-public class Scene implements java.io.Serializable
-{
+public class Scene implements java.io.Serializable {
+
     public final Vector lights;
     public final Vector objects;
     private View view;
 
-    public Scene ()
-    {
-        this.lights = new Vector ();
-        this.objects = new Vector ();
+    public Scene() {
+        this.lights = new Vector();
+        this.objects = new Vector();
     }
 
     @SuppressWarnings("unchecked")
-    public void addLight(Light l)
-    {
+    public void addLight(Light l) {
         this.lights.addElement(l);
     }
 
     @SuppressWarnings("unchecked")
-    public void addObject(Primitive object)
-    {
+    public void addObject(Primitive object) {
         this.objects.addElement(object);
     }
 
-    public void setView(View view)
-    {
+    public void setView(View view) {
         this.view = view;
     }
 
-    public View getView()
-    {
+    public View getView() {
         return this.view;
     }
 
-    public Light getLight(int number)
-    {
+    public Light getLight(int number) {
         return (Light) this.lights.elementAt(number);
     }
 
-    public Primitive getObject(int number)
-    {
+    public Primitive getObject(int number) {
         return (Primitive) objects.elementAt(number);
     }
 
-    public int getLights()
-    {
+    public int getLights() {
         return this.lights.size();
     }
 
-    public int getObjects()
-    {
+    public int getObjects() {
         return this.objects.size();
     }
 
     @SuppressWarnings("unchecked")
-    public void setObject(Primitive object, int pos)
-    {
+    public void setObject(Primitive object, int pos) {
         this.objects.setElementAt(object, pos);
     }
 }

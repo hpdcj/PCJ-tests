@@ -20,19 +20,10 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-
 package org.pcj.tests.app.raytracer;
 
-public class Interval implements java.io.Serializable
-{
-/*
-public int number;
-  public int width;
-  public int height;
-  public int yfrom;
-  public int yto;
-  public int total;
-*/  
+public class Interval implements java.io.Serializable {
+
     public final int number;
     public final int width;
     public final int height;
@@ -40,8 +31,7 @@ public int number;
     public final int yto;
     public final int total;
 
-    public Interval(int number, int width, int height, int yfrom, int yto, int total)
-    {
+    public Interval(int number, int width, int height, int yfrom, int yto, int total) {
         this.number = number;
         this.width = width;
         this.height = height;

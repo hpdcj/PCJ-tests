@@ -91,6 +91,10 @@ public class MainArgs {
                 startPoint = org.pcj.tests.app.moldyn.MolDynD.class; // StartPoint
                 storage = org.pcj.tests.app.moldyn.MolDynStorage.class; // Storage
                 break;
+            case "MolDynE":
+                startPoint = org.pcj.tests.app.moldyn.MolDynE.class; // StartPoint
+                storage = org.pcj.tests.app.moldyn.MolDynStorage.class; // Storage
+                break;
             case "EasyTest":
             default:
                 startPoint = org.pcj.tests.EasyTest.class;

@@ -1,7 +1,27 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/**************************************************************************
+*                                                                         *
+*             Java Grande Forum Benchmark Suite - MPJ Version 1.0         *
+*                                                                         *
+*                            produced by                                  *
+*                                                                         *
+*                  Java Grande Benchmarking Project                       *
+*                                                                         *
+*                                at                                       *
+*                                                                         *
+*                Edinburgh Parallel Computing Centre                      *
+*                                                                         * 
+*                email: epcc-javagrande@epcc.ed.ac.uk                     *
+*                                                                         *
+*                  Original version of this code by                       *
+*                         Dieter Heermann                                 * 
+*                       converted to Java by                              *
+*                Lorna Smith  (l.smith@epcc.ed.ac.uk)                     *
+*                   (see copyright notice below)                          *
+*                                                                         *
+*      This version copyright (c) The University of Edinburgh, 2001.      *
+*                         All rights reserved.                            *
+*                                                                         *
+**************************************************************************/
 package org.pcj.tests.app.raytracer;
 
 import org.pcj.PCJ;
@@ -296,6 +316,7 @@ public class RayTracerBench {
      * Checks if there is a shadow
      *
      * @param r The ray
+     *
      * @return Returns 1 if there is a shadow, 0 if there isn't
      */
     int Shadow(Ray r, double tmax) {

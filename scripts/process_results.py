@@ -2,6 +2,7 @@ from re import compile
 from sys import stdout, stderr
 from math import ceil
 from os.path import isfile
+from os import listdir
 
 
 
@@ -25,7 +26,8 @@ dat_input=0
 
 nodesthreads_pattern = compile(r"(?P<name>\S+)\s+using:\s*(?P<nodes>\d+)\s+nodes\s*(?P<threads>\d+)\s+threads?")
 result_pattern = compile(r"(?P<name>\S+)\s+(?P<cores>\d+)\s+(size\s+(?P<size>\d+(?:\.\d*)?)\s+)?time\s+(?P<time>\d+(?:\.\d*)?)")
-for filename in ["barrier.out", "broadcast.out", "piint.out", "pimc.out", "moldync.out", "moldynd.out", "raytracerc.out", "raytracerd.out"]:
+result_benchmarks=sorted([name for name in listdir(".") if name.endswith(".out") and not name.startswith("pingpong")])
+for filename in result_benchmarks:
     stderr.write("Processing file: %s..."%filename)
     if isfile(filename) == False:
         stderr.write(" file doesn't exist!\n")
@@ -81,7 +83,7 @@ for filename in ["barrier.out", "broadcast.out", "piint.out", "pimc.out", "moldy
         else:
             plot_name = "%s (%.7g KB)" % (name, size)
         dat.write("### Input %d: %s" % (dat_input,plot_name))
-        dat.write("\n# Nproc")
+        dat.write("\n# Nproc\tt_min")
         for nodes in l_nodes:
             dat.write("\t%d"%nodes)
         dat.write("\n")
@@ -108,7 +110,7 @@ for filename in ["barrier.out", "broadcast.out", "piint.out", "pimc.out", "moldy
         plt.write("set xrange [0.9:%.1f]\n" % (sorted(cores_values)[-1]*1.1))
         plt.write("set xtics (%s)\n" % xtics)
         plt.write("#set key nobox at %.3f,%.3f\n" % (sorted(cores_values)[-1],0.01))
-        plt.write("set output '%s_%d.png'\n\n" % (name, dat_input))
+        plt.write("set output '%s_%d.png'\n\n" % (filename[:-4], dat_input))
 
         #plt.write("plot 'plot.dat' i %d u 1:2 t 'min' w lp lt 9 lw 2 pt 0" % dat_input) # min
         col=3
@@ -136,7 +138,8 @@ for filename in ["barrier.out", "broadcast.out", "piint.out", "pimc.out", "moldy
 
 
 pingpong_pattern = compile(r"(?P<name>\S+)\s+(?P<cores>\d+)\s+size\s+(?P<size>\d+(?:\.\d*)?)\s+t_get\s+(?P<t_get>\d+(?:\.\d*)?)\s+t_put\s+(?P<t_put>\d+(?:\.\d*)?)\s+t_putB\s+(?P<t_putB>\d+(?:\.\d*)?)")
-for filename in ["pingpong_1n2t.out", "pingpong_2n1t.out"]:
+pingpong_benchmarks=sorted([name for name in listdir(".") if name.endswith(".out") and name.startswith("pingpong")])
+for filename in pingpong_benchmarks:
     stderr.write("Processing file: %s..."%filename)
     if isfile(filename) == False:
         stderr.write(" file doesn't exist!\n")
@@ -201,7 +204,7 @@ for filename in ["pingpong_1n2t.out", "pingpong_2n1t.out"]:
     plt.write("set xrange [%.7f:%.1f]\n" % (l_sizes[0]*0.9, l_sizes[-1]*1.1))
     plt.write("set xtics (%s)\n" % xtics)
     plt.write("#set key nobox at %.3f,%.3f\n" % (l_sizes[-1],0.01))
-    plt.write("set output '%s_%d.png'\n\n" % (name, dat_input))
+    plt.write("set output '%s_%d.png'\n\n" % (filename[:-4], dat_input))
 
     col=2
     plt.write("plot 'plot.dat' i %d u 1:%d t '%s' w lp lt %d lw 3 pt 7"%(

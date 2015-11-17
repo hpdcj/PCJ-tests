@@ -1,12 +1,33 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/**************************************************************************
+*                                                                         *
+*             Java Grande Forum Benchmark Suite - MPJ Version 1.0         *
+*                                                                         *
+*                            produced by                                  *
+*                                                                         *
+*                  Java Grande Benchmarking Project                       *
+*                                                                         *
+*                                at                                       *
+*                                                                         *
+*                Edinburgh Parallel Computing Centre                      *
+*                                                                         * 
+*                email: epcc-javagrande@epcc.ed.ac.uk                     *
+*                                                                         *
+*                  Original version of this code by                       *
+*                         Dieter Heermann                                 * 
+*                       converted to Java by                              *
+*                Lorna Smith  (l.smith@epcc.ed.ac.uk)                     *
+*                   (see copyright notice below)                          *
+*                                                                         *
+*      This version copyright (c) The University of Edinburgh, 2001.      *
+*                         All rights reserved.                            *
+*                                                                         *
+**************************************************************************/
 package org.pcj.tests.app.moldyn;
 
 import org.pcj.PCJ;
 
 /**
+ * PCJ version of JGF Benchmark
  *
  * @author faramir
  */
@@ -24,7 +45,7 @@ public class MolDynBench {
     public double vir = 0.0;
     public double count = 0.0;
     int size;
-    int datasizes[] = {8, 13, 16, 24};
+    int datasizes[] = {8, 13, 16, 24, 48};
     public long interactions = 0;
     int i, j, k, lg, mdsize, move, mm;
     double l, rcoff, rcoffs, side, sideh, hsq, hsq2, vel;
@@ -169,15 +190,17 @@ public class MolDynBench {
         for (move = 0; move < movemx; move++) {
 
             for (i = 0; i < mdsize; i++) {
-                one[i].domove(side);        /* move the particles and update velocities */
+                one[i].domove(side);
+                /* move the particles and update velocities */
 
             }
 
             epot = 0.0;
             vir = 0.0;
 
-            for (i = 0 + rank; i < mdsize; i += nprocess) {
-                one[i].force(side, rcoff, mdsize, i);  /* compute forces */
+            for (i = rank; i < mdsize; i += nprocess) {
+                one[i].force(side, rcoff, mdsize, i);
+                /* compute forces */
 
             }
 
@@ -267,7 +290,8 @@ public class MolDynBench {
             sum = 0.0;
 
             for (i = 0; i < mdsize; i++) {
-                sum = sum + one[i].mkekin(hsq2);    /*scale forces, update velocities */
+                sum = sum + one[i].mkekin(hsq2);
+                /*scale forces, update velocities */
 
             }
 
@@ -277,13 +301,14 @@ public class MolDynBench {
             count = 0.0;
 
             for (i = 0; i < mdsize; i++) {
-                vel = vel + one[i].velavg(vaverh, h); /* average velocity */
+                vel = vel + one[i].velavg(vaverh, h);
+                /* average velocity */
 
             }
 
             vel = vel / h;
 
-            /* tmeperature scale if required */
+            /* temperature scale if required */
             if ((move < istop) && (((move + 1) % irep) == 0)) {
                 sc = Math.sqrt(tref / (tscale * ekin));
                 for (i = 0; i < mdsize; i++) {
@@ -292,7 +317,7 @@ public class MolDynBench {
                 ekin = tref / tscale;
             }
 
-            /* sum to getLocal full potential energy and virial */
+            /* sum to get full potential energy and virial */
             if (((move + 1) % iprint) == 0) {
                 ek = 24.0 * ekin;
                 epot = 4.0 * epot;
@@ -342,7 +367,8 @@ public class MolDynBench {
 
     public void JGFvalidate() {
         double refval[] = {1731.4306625334357, 7397.392307839352,
-            13774.625810229074, 46548.77475182352};
+            13774.625810229074, 46548.77475182352, 372757.1114270106
+        };
         double dev = Math.abs(ek - refval[size]);
         if (dev > 1.0e-8) {
             System.err.println("Validation failed");

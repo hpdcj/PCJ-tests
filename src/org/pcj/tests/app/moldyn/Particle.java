@@ -1,8 +1,27 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/**************************************************************************
+*                                                                         *
+*             Java Grande Forum Benchmark Suite - MPJ Version 1.0         *
+*                                                                         *
+*                            produced by                                  *
+*                                                                         *
+*                  Java Grande Benchmarking Project                       *
+*                                                                         *
+*                                at                                       *
+*                                                                         *
+*                Edinburgh Parallel Computing Centre                      *
+*                                                                         * 
+*                email: epcc-javagrande@epcc.ed.ac.uk                     *
+*                                                                         *
+*                  Original version of this code by                       *
+*                         Dieter Heermann                                 * 
+*                       converted to Java by                              *
+*                Lorna Smith  (l.smith@epcc.ed.ac.uk)                     *
+*                   (see copyright notice below)                          *
+*                                                                         *
+*      This version copyright (c) The University of Edinburgh, 2001.      *
+*                         All rights reserved.                            *
+*                                                                         *
+**************************************************************************/
 package org.pcj.tests.app.moldyn;
 
 /**
@@ -10,6 +29,7 @@ package org.pcj.tests.app.moldyn;
  * @author faramir
  */
 public class Particle {
+
     private final MolDynBench md;
     public double xcoord;
     public double ycoord;
@@ -174,5 +194,5 @@ public class Particle {
         yvelocity = yvelocity * sc;
         zvelocity = zvelocity * sc;
     }
-    
+
 }

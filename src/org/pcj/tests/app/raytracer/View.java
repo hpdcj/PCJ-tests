@@ -20,36 +20,23 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
+package org.pcj.tests.app.raytracer;
 
+public class View implements java.io.Serializable {
 
-package org.pcj.tests.app.raytracer; 
+    public final Vec from;
+    public final Vec at;
+    public final Vec up;
+    public final double dist;
+    public final double angle;
+    public final double aspect;
 
-
-public class View implements java.io.Serializable
-{
-/*    public  Vec     from;
-	public  Vec	    at;
-	public  Vec	    up;
-	public  double	dist;
-	public  double	angle;
-	public  double	aspect;*/
-    public final Vec       from;
-	public final Vec	    at;
-	public final Vec	    up;
-	public final double	dist;
-	public final double	angle;
-	public final double	aspect;
-		
-	public View (Vec from, Vec at, Vec up, double dist, double angle, double aspect)
-	{
+    public View(Vec from, Vec at, Vec up, double dist, double angle, double aspect) {
         this.from = from;
         this.at = at;
         this.up = up;
         this.dist = dist;
         this.angle = angle;
-        this.aspect = aspect;	    	    
-	}
+        this.aspect = aspect;
+    }
 }
-
-
-

@@ -20,12 +20,12 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-
 package org.pcj.tests.app.raytracer;
 
 public class Isect {
-	public double		t;
-	public int		enter;
-	public Primitive	prim;
-	public Surface		surf;
+
+    public double t;
+    public int enter;
+    public Primitive prim;
+    public Surface surf;
 }

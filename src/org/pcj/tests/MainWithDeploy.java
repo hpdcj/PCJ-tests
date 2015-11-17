@@ -28,6 +28,7 @@ public class MainWithDeploy {
 //            args = new String[]{"MolDynB"};
 //            args = new String[]{"MolDynC"};
 //            args = new String[]{"MolDynD"};
+//            args = new String[]{"MolDynE"};
             System.exit(1);
         }
 
