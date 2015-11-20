@@ -74,7 +74,7 @@ for filename in result_benchmarks:
 
     l_nodes = sorted(s_nodes, reverse=False)
     l_cores = sorted(s_cores, reverse=False)
-    l_xtics = l_cores[::int(ceil(len(l_cores)/4.))]
+    l_xtics = l_cores[::int(ceil(len(l_cores)/8.))]
     if l_cores[-1] not in l_xtics: l_xtics.append(l_cores[-1])
     xtics = (", ".join(['"%d" %d' % (x,x) for x in l_xtics]))
     l_cores = None
@@ -87,7 +87,7 @@ for filename in result_benchmarks:
             plot_name = name
         else:
             plot_name = "%s (%.7g KB)" % (name, size)
-        dat.write("### Input %d: %s" % (dat_input,plot_name))
+        dat.write("### Input %d: %s (%s)" % (dat_input,plot_name,filename))
         dat.write("\n# Nproc\tt_min")
         for nodes in l_nodes:
             dat.write("\t%d"%nodes)
@@ -117,16 +117,18 @@ for filename in result_benchmarks:
         plt.write("#set key nobox at %.3f,%.3f\n" % (sorted(cores_values)[-1],0.01))
         plt.write("set output '%s_%d.png'\n\n" % (filename[:-4], dat_input))
 
-        #plt.write("plot 'plot.dat' i %d u 1:2 t 'min' w lp lt 9 lw 2 pt 0" % dat_input) # min
-        col=3
-        plt.write("plot 'plot.dat' i %d u 1:%d t '%d nodes' w lp lt %d lw 3 pt 7"%(
-            dat_input,
-            col, # column
-            l_nodes[0], # nodes
-            col-2 # color
-        ))
-        col = col+1
-        for nodes in l_nodes[1:]:
+        plt.write("plot 'plot.dat' i %d u 1:2 t 'min' w lp lt 9 lw 2 pt 0" % dat_input) # min
+#        col = 3
+#        plt.write("plot 'plot.dat' i %d u 1:%d t '%d nodes' w lp lt %d lw 3 pt 7"%(
+#            dat_input,
+#            col, # column
+#            l_nodes[0], # nodes
+#            col-2 # color
+#        ))
+#        col = col+1
+#        for nodes in l_nodes[1:]:
+        col = 3
+        for nodes in l_nodes:
             plt.write(",\\\n     'plot.dat' i %d u 1:%d t '%d nodes' w lp lt %d lw 3 pt 7"%(
                 dat_input,
                 col, # column
