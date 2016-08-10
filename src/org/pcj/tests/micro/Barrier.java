@@ -1,10 +1,18 @@
 package org.pcj.tests.micro;
 
 import org.pcj.PCJ;
+import org.pcj.Shared;
 
-public class Barrier
-        extends org.pcj.Storage
-        implements org.pcj.StartPoint {
+public class Barrier implements org.pcj.StartPoint {
+
+    public enum EmptyStorage implements Shared {
+        ;
+
+        @Override
+        public Class<?> type() {
+            return null;
+        }
+    }
 
     @Override
     public void main() {
@@ -36,41 +44,4 @@ public class Barrier
                     PCJ.threadCount(), tmin);
         }
     }
-
-//    public static void main(String[] args) {
-//        int[] threads = {1, 2, 4, 8, 16, 32};
-//
-//        Set<String> nodesSet = new LinkedHashSet<>();
-//        try (Scanner s = new Scanner(new File("nodes.txt"))) {
-//            while (s.hasNextLine()) {
-//                String node = s.nextLine();
-//                nodesSet.add(node);
-//            }
-//        } catch (IOException ex) {
-//            Logger.getLogger(Barrier.class.getName())
-//                    .log(Level.SEVERE,
-//                            "Unable to load descriptor file",
-//                            ex);
-//            System.exit(1);
-//        }
-//
-//        String[] nodesUniq = nodesSet.toArray(new String[0]);
-//
-//        for (int nn = nodesUniq.length; nn > 0; nn = nn / 2) {
-//            for (int nt : threads) {
-//                String[] nodes = new String[nt * nn];
-//                System.out.printf(" Start deploy nn=%d nt=%d",
-//                        nn, nt);
-//                int ii = 0;
-//                for (int i = 0; i < nn; i++) {
-//                    for (int j = 0; j < nt; j++, ii++) {
-//                        nodes[ii] = nodesUniq[i];
-//                    }
-//                }
-//                PCJ.deploy(Barrier.class,
-//                        Barrier.class,
-//                        nodes);
-//            }
-//        }
-//    }
 }

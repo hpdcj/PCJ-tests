@@ -3,6 +3,7 @@
  */
 package org.pcj.tests;
 
+import org.pcj.NodesDescription;
 import org.pcj.PCJ;
 
 /**
@@ -12,14 +13,12 @@ import org.pcj.PCJ;
 public class MainWithDeploy {
 
     public static void main(String[] args) throws Throwable {
-        if (args.length == 0) {
-            System.out.println("<start point> [nodes file] [num nodes]");
 //            args = new String[]{"EasyTest"};
+//            args = new String[]{"PiInt"};
+//            args = new String[]{"PiMC"};
 //            args = new String[]{"Barrier"};
 //            args = new String[]{"Broadcast"};
 //            args = new String[]{"PingPong"};
-//            args = new String[]{"PiInt"};
-//            args = new String[]{"PiMC"};
 //            args = new String[]{"RayTracerA"};
 //            args = new String[]{"RayTracerB"};
 //            args = new String[]{"RayTracerC"};
@@ -29,6 +28,9 @@ public class MainWithDeploy {
 //            args = new String[]{"MolDynC"};
 //            args = new String[]{"MolDynD"};
 //            args = new String[]{"MolDynE"};
+
+        if (args.length == 0) {
+            System.out.println("<start point> [nodes file] [num nodes]");
             System.exit(1);
         }
 
@@ -39,6 +41,8 @@ public class MainWithDeploy {
             System.exit(2);
         }
 
-        PCJ.deploy(mainArgs.getStartPoint(), mainArgs.getStorage(), mainArgs.getNodes());
+        PCJ.deploy(mainArgs.getStartPoint(),
+                new NodesDescription(mainArgs.getNodes()),
+                mainArgs.getStorage());
     }
 }

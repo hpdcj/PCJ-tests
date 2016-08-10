@@ -220,37 +220,37 @@ public class MolDynBench {
 //            MPI.COMM_WORLD.Allreduce(tmp_yforce, 0, tmp_yforce, 0, mdsize, MPI.DOUBLE, MPI.SUM);
 //            MPI.COMM_WORLD.Allreduce(tmp_zforce, 0, tmp_zforce, 0, mdsize, MPI.DOUBLE, MPI.SUM);
             if (PCJ.myId() != 0) {
-                PCJ.put(0, "r_epot", epot, PCJ.myId());
-                PCJ.put(0, "r_vir", vir, PCJ.myId());
-                PCJ.put(0, "r_interactions", interactions, PCJ.myId());
+                PCJ.put(0, MolDynStorage.r_epot, epot, PCJ.myId());
+                PCJ.put(0, MolDynStorage.r_vir, vir, PCJ.myId());
+                PCJ.put(0, MolDynStorage.r_interactions, interactions, PCJ.myId());
 
-                PCJ.put(0, "r_xforce", tmp_xforce, PCJ.myId());
-                PCJ.put(0, "r_yforce", tmp_yforce, PCJ.myId());
-                PCJ.put(0, "r_zforce", tmp_zforce, PCJ.myId());
+                PCJ.put(0, MolDynStorage.r_xforce, tmp_xforce, PCJ.myId());
+                PCJ.put(0, MolDynStorage.r_yforce, tmp_yforce, PCJ.myId());
+                PCJ.put(0, MolDynStorage.r_zforce, tmp_zforce, PCJ.myId());
             } else {
-                PCJ.waitFor("r_epot", PCJ.threadCount() - 1);
-                PCJ.waitFor("r_vir", PCJ.threadCount() - 1);
-                PCJ.waitFor("r_interactions", PCJ.threadCount() - 1);
+                PCJ.waitFor(MolDynStorage.r_epot, PCJ.threadCount() - 1);
+                PCJ.waitFor(MolDynStorage.r_vir, PCJ.threadCount() - 1);
+                PCJ.waitFor(MolDynStorage.r_interactions, PCJ.threadCount() - 1);
 
-                double[] r_epot = PCJ.getLocal("r_epot");
-                double[] r_vir = PCJ.getLocal("r_vir");
-                long[] r_interactions = PCJ.getLocal("r_interactions");
+                double[] r_epot = PCJ.getLocal(MolDynStorage.r_epot);
+                double[] r_vir = PCJ.getLocal(MolDynStorage.r_vir);
+                long[] r_interactions = PCJ.getLocal(MolDynStorage.r_interactions);
                 for (int node = 1; node < PCJ.threadCount(); ++node) {
                     epot += r_epot[node];
                     vir += r_vir[node];
                     interactions += r_interactions[node];
                 }
-                PCJ.broadcast("tmp_epot", epot);
-                PCJ.broadcast("tmp_vir", vir);
-                PCJ.broadcast("tmp_interactions", interactions);
+                PCJ.broadcast(MolDynStorage.tmp_epot, epot);
+                PCJ.broadcast(MolDynStorage.tmp_vir, vir);
+                PCJ.broadcast(MolDynStorage.tmp_interactions, interactions);
 
-                PCJ.waitFor("r_xforce", PCJ.threadCount() - 1);
-                PCJ.waitFor("r_yforce", PCJ.threadCount() - 1);
-                PCJ.waitFor("r_zforce", PCJ.threadCount() - 1);
+                PCJ.waitFor(MolDynStorage.r_xforce, PCJ.threadCount() - 1);
+                PCJ.waitFor(MolDynStorage.r_yforce, PCJ.threadCount() - 1);
+                PCJ.waitFor(MolDynStorage.r_zforce, PCJ.threadCount() - 1);
 
-                double[][] r_xforce = PCJ.getLocal("r_xforce");
-                double[][] r_yforce = PCJ.getLocal("r_yforce");
-                double[][] r_zforce = PCJ.getLocal("r_zforce");
+                double[][] r_xforce = PCJ.getLocal(MolDynStorage.r_xforce);
+                double[][] r_yforce = PCJ.getLocal(MolDynStorage.r_yforce);
+                double[][] r_zforce = PCJ.getLocal(MolDynStorage.r_zforce);
 
                 for (int node = 1; node < PCJ.threadCount(); ++node) {
                     for (i = 0; i < mdsize; ++i) {
@@ -259,26 +259,26 @@ public class MolDynBench {
                         tmp_zforce[i] += r_zforce[node][i];
                     }
                 }
-                PCJ.broadcast("tmp_xforce", tmp_xforce);
-                PCJ.broadcast("tmp_yforce", tmp_yforce);
-                PCJ.broadcast("tmp_zforce", tmp_zforce);
+                PCJ.broadcast(MolDynStorage.tmp_xforce, tmp_xforce);
+                PCJ.broadcast(MolDynStorage.tmp_yforce, tmp_yforce);
+                PCJ.broadcast(MolDynStorage.tmp_zforce, tmp_zforce);
             }
 
-            PCJ.waitFor("tmp_epot");
-            PCJ.waitFor("tmp_vir");
-            PCJ.waitFor("tmp_interactions");
+            PCJ.waitFor(MolDynStorage.tmp_epot);
+            PCJ.waitFor(MolDynStorage.tmp_vir);
+            PCJ.waitFor(MolDynStorage.tmp_interactions);
 
-            epot = PCJ.getLocal("tmp_epot");
-            vir = PCJ.getLocal("tmp_vir");
-            interactions = PCJ.getLocal("tmp_interactions");
+            epot = PCJ.getLocal(MolDynStorage.tmp_epot);
+            vir = PCJ.getLocal(MolDynStorage.tmp_vir);
+            interactions = PCJ.getLocal(MolDynStorage.tmp_interactions);
 
-            PCJ.waitFor("tmp_xforce");
-            PCJ.waitFor("tmp_yforce");
-            PCJ.waitFor("tmp_zforce");
+            PCJ.waitFor(MolDynStorage.tmp_xforce);
+            PCJ.waitFor(MolDynStorage.tmp_yforce);
+            PCJ.waitFor(MolDynStorage.tmp_zforce);
 
-            tmp_xforce = PCJ.getLocal("tmp_xforce");
-            tmp_yforce = PCJ.getLocal("tmp_yforce");
-            tmp_zforce = PCJ.getLocal("tmp_zforce");
+            tmp_xforce = PCJ.getLocal(MolDynStorage.tmp_xforce);
+            tmp_yforce = PCJ.getLocal(MolDynStorage.tmp_yforce);
+            tmp_zforce = PCJ.getLocal(MolDynStorage.tmp_zforce);
 
             for (i = 0; i < mdsize; i++) {
                 one[i].xforce = tmp_xforce[i];
@@ -336,27 +336,27 @@ public class MolDynBench {
 
     public void JGFinitialise() {
         if (PCJ.myId() == 0) {
-            PCJ.putLocal("r_xforce", new double[PCJ.threadCount()][0]);
-            PCJ.putLocal("r_yforce", new double[PCJ.threadCount()][0]);
-            PCJ.putLocal("r_zforce", new double[PCJ.threadCount()][0]);
-            PCJ.putLocal("r_epot", new double[PCJ.threadCount()]);
-            PCJ.putLocal("r_vir", new double[PCJ.threadCount()]);
-            PCJ.putLocal("r_interactions", new long[PCJ.threadCount()]);
+            PCJ.putLocal(MolDynStorage.r_xforce, new double[PCJ.threadCount()][0]);
+            PCJ.putLocal(MolDynStorage.r_yforce, new double[PCJ.threadCount()][0]);
+            PCJ.putLocal(MolDynStorage.r_zforce, new double[PCJ.threadCount()][0]);
+            PCJ.putLocal(MolDynStorage.r_epot, new double[PCJ.threadCount()]);
+            PCJ.putLocal(MolDynStorage.r_vir, new double[PCJ.threadCount()]);
+            PCJ.putLocal(MolDynStorage.r_interactions, new long[PCJ.threadCount()]);
 
-            PCJ.monitor("r_xforce");
-            PCJ.monitor("r_yforce");
-            PCJ.monitor("r_zforce");
-            PCJ.monitor("r_epot");
-            PCJ.monitor("r_vir");
-            PCJ.monitor("r_interactions");
+            PCJ.monitor(MolDynStorage.r_xforce);
+            PCJ.monitor(MolDynStorage.r_yforce);
+            PCJ.monitor(MolDynStorage.r_zforce);
+            PCJ.monitor(MolDynStorage.r_epot);
+            PCJ.monitor(MolDynStorage.r_vir);
+            PCJ.monitor(MolDynStorage.r_interactions);
         }
 
-        PCJ.monitor("tmp_xforce");
-        PCJ.monitor("tmp_yforce");
-        PCJ.monitor("tmp_zforce");
-        PCJ.monitor("tmp_epot");
-        PCJ.monitor("tmp_vir");
-        PCJ.monitor("tmp_interactions");
+        PCJ.monitor(MolDynStorage.tmp_xforce);
+        PCJ.monitor(MolDynStorage.tmp_yforce);
+        PCJ.monitor(MolDynStorage.tmp_zforce);
+        PCJ.monitor(MolDynStorage.tmp_epot);
+        PCJ.monitor(MolDynStorage.tmp_vir);
+        PCJ.monitor(MolDynStorage.tmp_interactions);
 
         initialise();
     }

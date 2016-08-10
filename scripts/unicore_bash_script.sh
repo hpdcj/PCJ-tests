@@ -41,7 +41,7 @@ mpiexec -npernode 1 hostname -s > all_nodes.uniq
 
 log "All nodes: `uniq -c all_nodes.txt | xargs -I {} echo ' {}' | paste -sd ','`"
 
-# --- RUNNING TESTS ---.
+# --- RUNNING TESTS ---
 log "Running tests"
 
 CORES_ON_NODE=(64 32 16 12 8 4 2 1)

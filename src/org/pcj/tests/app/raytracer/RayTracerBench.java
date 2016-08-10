@@ -1,27 +1,29 @@
-/**************************************************************************
-*                                                                         *
-*             Java Grande Forum Benchmark Suite - MPJ Version 1.0         *
-*                                                                         *
-*                            produced by                                  *
-*                                                                         *
-*                  Java Grande Benchmarking Project                       *
-*                                                                         *
-*                                at                                       *
-*                                                                         *
-*                Edinburgh Parallel Computing Centre                      *
-*                                                                         * 
-*                email: epcc-javagrande@epcc.ed.ac.uk                     *
-*                                                                         *
-*                  Original version of this code by                       *
-*                         Dieter Heermann                                 * 
-*                       converted to Java by                              *
-*                Lorna Smith  (l.smith@epcc.ed.ac.uk)                     *
-*                   (see copyright notice below)                          *
-*                                                                         *
-*      This version copyright (c) The University of Edinburgh, 2001.      *
-*                         All rights reserved.                            *
-*                                                                         *
-**************************************************************************/
+/**
+ * ************************************************************************
+ *                                                                         *
+ *             Java Grande Forum Benchmark Suite - MPJ Version 1.0         *
+ *                                                                         *
+ *                            produced by                                  *
+ *                                                                         *
+ *                  Java Grande Benchmarking Project                       *
+ *                                                                         *
+ *                                at                                       *
+ *                                                                         *
+ *                Edinburgh Parallel Computing Centre                      *
+ *                                                                         *
+ *                email: epcc-javagrande@epcc.ed.ac.uk                     *
+ *                                                                         *
+ *                  Original version of this code by                       *
+ *                         Dieter Heermann                                 *
+ *                       converted to Java by                              *
+ *                Lorna Smith  (l.smith@epcc.ed.ac.uk)                     *
+ *                   (see copyright notice below)                          *
+ *                                                                         *
+ *      This version copyright (c) The University of Edinburgh, 2001.      *
+ *                         All rights reserved.                            *
+ *                                                                         *
+ *************************************************************************
+ */
 package org.pcj.tests.app.raytracer;
 
 import org.pcj.PCJ;
@@ -262,21 +264,21 @@ public class RayTracerBench {
 //        if (PCJ.myId() == 0) {
 //            checksum = (long) tmp_checksum[0];
 //        }
-        PCJ.put(0, "r_checksum", checksum, PCJ.myId());
-        PCJ.put(0, "r_p_row", p_row, PCJ.myId());
+        PCJ.put(0, RayTracerStorage.r_checksum, checksum, PCJ.myId());
+        PCJ.put(0, RayTracerStorage.r_p_row, p_row, PCJ.myId());
         if (PCJ.myId() == 0) {
-            PCJ.waitFor("r_checksum", PCJ.threadCount());
+            PCJ.waitFor(RayTracerStorage.r_checksum, PCJ.threadCount());
 
             checksum = 0;
-            long[] r_checksum = PCJ.getLocal("r_checksum");
+            long[] r_checksum = PCJ.getLocal(RayTracerStorage.r_checksum);
             for (long tmp : r_checksum) {
                 checksum += tmp;
             }
             /*
              * send temporary copies of p_row back to row
              */
-            PCJ.waitFor("r_p_row", PCJ.threadCount());
-            int[][] r_p_row = PCJ.getLocal("r_p_row");
+            PCJ.waitFor(RayTracerStorage.r_p_row, PCJ.threadCount());
+            int[][] r_p_row = PCJ.getLocal(RayTracerStorage.r_p_row);
 
             for (int k = 0; k < PCJ.threadCount(); k++) {
                 p_row = r_p_row[k];
@@ -460,11 +462,11 @@ public class RayTracerBench {
         // set image size
         width = height = datasizes[size];
         if (PCJ.myId() == 0) {
-            PCJ.putLocal("r_checksum", new long[PCJ.threadCount()]);
-            PCJ.putLocal("r_p_row", new int[PCJ.threadCount()][0]);
+            PCJ.putLocal(RayTracerStorage.r_checksum, new long[PCJ.threadCount()]);
+            PCJ.putLocal(RayTracerStorage.r_p_row, new int[PCJ.threadCount()][0]);
 
-            PCJ.monitor("r_checksum");
-            PCJ.monitor("r_p_row");
+            PCJ.monitor(RayTracerStorage.r_checksum);
+            PCJ.monitor(RayTracerStorage.r_p_row);
         }
 
         // create the objects to be rendered

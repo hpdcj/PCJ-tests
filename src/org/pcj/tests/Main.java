@@ -4,6 +4,7 @@
 package org.pcj.tests;
 
 import java.util.Arrays;
+import org.pcj.NodesDescription;
 import org.pcj.PCJ;
 
 /**
@@ -26,7 +27,9 @@ public class Main {
         }
 
         try {
-            PCJ.start(mainArgs.getStartPoint(), mainArgs.getStorage(), mainArgs.getNodes());
+            PCJ.start(mainArgs.getStartPoint(),
+                    new NodesDescription(mainArgs.getNodes()),
+                    mainArgs.getStorage());
         } catch (NullPointerException ex) {
             System.err.println("Used nodes: " + Arrays.toString(mainArgs.getNodes()));
             throw ex;

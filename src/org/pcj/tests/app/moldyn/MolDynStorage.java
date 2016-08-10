@@ -5,37 +5,34 @@
 package org.pcj.tests.app.moldyn;
 
 import org.pcj.Shared;
-import org.pcj.Storage;
 
 /**
  *
  * @author faramir
  */
-public class MolDynStorage extends Storage {
+public enum MolDynStorage implements Shared {
 
-    @Shared
-    private double[] tmp_xforce;
-    @Shared
-    private double[] tmp_yforce;
-    @Shared
-    private double[] tmp_zforce;
-    @Shared
-    private double tmp_epot;
-    @Shared
-    private double tmp_vir;
-    @Shared
-    private long tmp_interactions;
+    tmp_xforce(double[].class),
+    tmp_yforce(double[].class),
+    tmp_zforce(double[].class),
+    tmp_epot(double.class),
+    tmp_vir(double.class),
+    tmp_interactions(long.class),
     /*reduce*/
-    @Shared
-    private double[][] r_xforce;
-    @Shared
-    private double[][] r_yforce;
-    @Shared
-    private double[][] r_zforce;
-    @Shared
-    private double[] r_epot;
-    @Shared
-    private double[] r_vir;
-    @Shared
-    private long[] r_interactions;
+    r_xforce(double[][].class),
+    r_yforce(double[][].class),
+    r_zforce(double[][].class),
+    r_epot(double[].class),
+    r_vir(double[].class),
+    r_interactions(long[].class);
+    private final Class<?> type;
+
+    private MolDynStorage(Class<?> type) {
+        this.type = type;
+    }
+
+    @Override
+    public Class<?> type() {
+        return type;
+    }
 }

@@ -12,8 +12,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import org.pcj.Shared;
 import org.pcj.StartPoint;
-import org.pcj.Storage;
 
 /**
  *
@@ -22,7 +22,7 @@ import org.pcj.Storage;
 public class MainArgs {
 
     private Class<? extends StartPoint> startPoint;
-    private Class<? extends Storage> storage;
+    private Class<? extends Enum<? extends Shared>> storage;
     private String[] nodes;
 
     private String[] readNodes(InputStream is) throws IOException {
@@ -41,23 +41,23 @@ public class MainArgs {
         switch (param) {
             case "PingPong":
                 startPoint = org.pcj.tests.micro.PingPong.class; // StartPoint
-                storage = org.pcj.tests.micro.PingPong.class; // Storage
+                storage = org.pcj.tests.micro.PingPong.SharedEnum.class; // Storage
                 break;
             case "Barrier":
                 startPoint = org.pcj.tests.micro.Barrier.class; // StartPoint
-                storage = org.pcj.tests.micro.Barrier.class; // Storage
+                storage = org.pcj.tests.micro.Barrier.EmptyStorage.class; // Storage
                 break;
             case "Broadcast":
                 startPoint = org.pcj.tests.micro.Broadcast.class; // StartPoint
-                storage = org.pcj.tests.micro.Broadcast.class; // Storage
+                storage = org.pcj.tests.micro.Broadcast.SharedEnum.class; // Storage
                 break;
             case "PiInt":
                 startPoint = org.pcj.tests.app.PiInt.class; // StartPoint
-                storage = org.pcj.tests.app.PiInt.class; // Storage
+                storage = org.pcj.tests.app.PiInt.SharedEnum.class; // Storage
                 break;
             case "PiMC":
                 startPoint = org.pcj.tests.app.PiMC.class; // StartPoint
-                storage = org.pcj.tests.app.PiMC.class; // Storage
+                storage = org.pcj.tests.app.PiMC.SharedEnum.class; // Storage
                 break;
             case "RayTracerA":
                 startPoint = org.pcj.tests.app.raytracer.RayTracerA.class;
@@ -98,7 +98,7 @@ public class MainArgs {
             case "EasyTest":
             default:
                 startPoint = org.pcj.tests.EasyTest.class;
-                storage = org.pcj.tests.EasyTest.class;
+                storage = org.pcj.tests.EasyTest.SharedEnum.class;
                 break;
         }
     }
@@ -134,7 +134,7 @@ public class MainArgs {
     /**
      * @return the storage
      */
-    Class<? extends Storage> getStorage() {
+    Class<? extends Enum<? extends Shared>> getStorage() {
         return storage;
     }
 

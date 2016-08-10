@@ -7,12 +7,22 @@ import org.pcj.Group;
 import org.pcj.PCJ;
 import org.pcj.Shared;
 import org.pcj.StartPoint;
-import org.pcj.Storage;
 
-public class PingPong extends Storage implements StartPoint {
+public class PingPong implements StartPoint {
 
-    @Shared
-    double[] a;
+    public enum SharedEnum implements Shared {
+        a(double[].class);
+        private final Class<?> type;
+
+        private SharedEnum(Class<?> type) {
+            this.type = type;
+        }
+
+        @Override
+        public Class<?> type() {
+            return type;
+        }
+    }
 
     @Override
     public void main() {
@@ -33,7 +43,7 @@ public class PingPong extends Storage implements StartPoint {
                 = {
                     1, 10, 100, 1024, 2048, 4096, 8192, 16384,
                     32768, 65536, 131072, 262144, 524288, 1048576, 2097152,
-                    4194304, //8388608, //16777216,
+                    4194304, // 8388608, 16777216, 33554432, 67108864, 134217728, 268435440, 2147483647
                 };
 
         final int ntimes = 100;
@@ -42,16 +52,20 @@ public class PingPong extends Storage implements StartPoint {
 
         for (int j = 0; j < transmit.length; j++) {
             int n = transmit[j];
+            if (PCJ.myId() == 0) {
+                System.err.println("n=" + n);
+            }
 
-            a = new double[n];
+            double[] a = new double[n];
             b = new double[n];
 
-            g.barrier();
+            g.asyncBarrier().get();
 
             for (int i = 0; i < n; i++) {
                 a[i] = (double) i + 1;
             }
-            g.barrier();
+            PCJ.putLocal(SharedEnum.a, a);
+            g.asyncBarrier().get();
 
             //get 
             double tmin_get = Double.MAX_VALUE;
@@ -59,22 +73,20 @@ public class PingPong extends Storage implements StartPoint {
                 long time = System.nanoTime();
                 for (int i = 0; i < ntimes; i++) {
                     if (g.myId() == 0) {
-                        b = g.get(1, "a");
+                        b = g.<double[]>asyncGet(1, SharedEnum.a).get();
                     }
                 }
                 time = System.nanoTime() - time;
                 double dtime = (time / (double) ntimes) * 1e-9;
 
-                g.barrier();
+                g.asyncBarrier().get();
                 if (tmin_get > dtime) {
                     tmin_get = dtime;
                 }
             }
-            g.barrier();
+            g.asyncBarrier().get();
 
             // put
-            PCJ.monitor("a"); // dodane
-            g.barrier();
             for (int i = 0; i < n; i++) {
                 a[i] = 0.0d;
                 b[i] = (double) i + 1;
@@ -85,24 +97,21 @@ public class PingPong extends Storage implements StartPoint {
                 long time = System.nanoTime();
                 for (int i = 0; i < ntimes; i++) {
                     if (g.myId() == 0) {
-                        g.put(1, "a", b);
-                    } else {
-                        PCJ.waitFor("a");
+                        g.asyncPut(1, SharedEnum.a, b).get();
                     }
                 }
 
                 time = System.nanoTime() - time;
                 double dtime = (time / (double) ntimes) * 1e-9;
 
-                g.barrier();
+                g.asyncBarrier().get();
                 if (tmin_put > dtime) {
                     tmin_put = dtime;
                 }
             }
+            g.asyncBarrier().get();
 
             // putB
-            PCJ.monitor("a");
-            g.barrier();
             for (int i = 0; i < n; i++) {
                 b[i] = (double) i + 1;
             }
@@ -112,17 +121,16 @@ public class PingPong extends Storage implements StartPoint {
                 long time = System.nanoTime();
                 for (int i = 0; i < ntimes; i++) {
                     if (g.myId() == i % 2) {
-                        g.put((i + 1) % 2, "a", b);
+                        g.asyncPut((i + 1) % 2, SharedEnum.a, b);
                     } else {
-                        PCJ.waitFor("a");
+                        PCJ.waitFor(SharedEnum.a);
                     }
                 }
 
                 time = System.nanoTime() - time;
                 double dtime = (time / (double) ntimes) * 1e-9;
 
-                g.barrier();
-
+                g.asyncBarrier().get();
                 if (tmin_putB > dtime) {
                     tmin_putB = dtime;
                 }
@@ -132,35 +140,7 @@ public class PingPong extends Storage implements StartPoint {
                 System.out.format("PingPong\t%5d\tsize %12.7f\tt_get %12.7f\tt_put %12.7f\tt_putB %12.7f%n",
                         g.threadCount(), (double) n / 128, tmin_get, tmin_put, tmin_putB);
             }
-
+//
         }
     }
-
-//    public static void main(String[] args) {
-//        String[] nodesTxt = new String[1024];
-//        Scanner nf = null;
-//        try {
-//            nf = new Scanner(new File(args.length > 0 ? args[0] : "nodes.txt"));
-//        } catch (FileNotFoundException ex) {
-//            System.err.println("File not found!");
-//        }
-//
-//        int n_nodes = 0;
-//        if (nf != null) {
-//            while (nf.hasNextLine()) {
-//                nodesTxt[n_nodes] = nf.nextLine();
-//                n_nodes++;
-//            }
-//        } else {
-//            for (int i = 0; i < 2; ++i) {
-//                nodesTxt[n_nodes] = "localhost:" + (8091 + i);
-//                n_nodes++;
-//            }
-//        }
-//
-//        String[] nodes = new String[2];
-//        nodes[0] = nodesTxt[0];
-//        nodes[1] = nodesTxt[1];
-//        PCJ.deploy(PingPong.class, PingPong.class, nodes);
-//    }
 }

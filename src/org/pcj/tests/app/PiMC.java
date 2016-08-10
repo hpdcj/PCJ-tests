@@ -1,16 +1,26 @@
 package org.pcj.tests.app;
 
 import java.util.Random;
-import org.pcj.FutureObject;
 import org.pcj.PCJ;
+import org.pcj.PcjFuture;
 import org.pcj.Shared;
 import org.pcj.StartPoint;
-import org.pcj.Storage;
 
-public class PiMC extends Storage implements StartPoint {
+public class PiMC implements StartPoint {
 
-    @Shared
-    long circleCount;
+    public enum SharedEnum implements Shared {
+        circleCount(long.class);
+        private final Class<?> type;
+
+        private SharedEnum(Class<?> type) {
+            this.type = type;
+        }
+
+        @Override
+        public Class<?> type() {
+            return type;
+        }
+    }
 
     @Override
     public void main() {
@@ -18,7 +28,7 @@ public class PiMC extends Storage implements StartPoint {
         long nAll = 512_000_000;
         long n = nAll / PCJ.threadCount();
 
-        circleCount = 0;
+        long circleCount = 0;
         long time = System.nanoTime();
 
         // Calculate  
@@ -29,15 +39,16 @@ public class PiMC extends Storage implements StartPoint {
                 circleCount++;
             }
         }
+        PCJ.putLocal(SharedEnum.circleCount, circleCount);
         PCJ.barrier();
 
         // Gather results 
         long c = 0;
-        FutureObject cL[] = new FutureObject[PCJ.threadCount()];
+        PcjFuture<Long> cL[] = new PcjFuture[PCJ.threadCount()];
 
         if (PCJ.myId() == 0) {
             for (int p = 0; p < PCJ.threadCount(); p++) {
-                cL[p] = PCJ.getFutureObject(p, "circleCount");
+                cL[p] = PCJ.asyncGet(p, SharedEnum.circleCount);
             }
             for (int p = 0; p < PCJ.threadCount(); p++) {
                 c = c + (long) cL[p].get();

@@ -1,26 +1,34 @@
 package org.pcj.tests.app;
 
-import org.pcj.FutureObject;
 import org.pcj.PCJ;
+import org.pcj.PcjFuture;
 import org.pcj.Shared;
 import org.pcj.StartPoint;
-import org.pcj.Storage;
 
 /**
  *
  * @author faramir
  */
-public class PiInt extends Storage implements StartPoint {
+public class PiInt implements StartPoint {
 
-    @Shared
-    private double sum;
+    public enum SharedEnum implements Shared {
+        sum(double.class);
+        private final Class<?> type;
 
-    @SuppressWarnings("method")
+        private SharedEnum(Class<?> type) {
+            this.type = type;
+        }
+
+        @Override
+        public Class<?> type() {
+            return type;
+        }
+    }
+
     private double f(double x) {
         return (4.0 / (1.0 + x * x));
     }
 
-    @SuppressWarnings("method")
     @Override
     public void main() throws Throwable {
         int ntimes = 100;
@@ -35,7 +43,7 @@ public class PiInt extends Storage implements StartPoint {
             PCJ.barrier();
         }
 
-        time = System.nanoTime()- time;
+        time = System.nanoTime() - time;
         double dtime = time * 1e-9;
 
         if (PCJ.myId() == 0) {
@@ -46,25 +54,25 @@ public class PiInt extends Storage implements StartPoint {
         }
     }
 
-    @SuppressWarnings("method")
     private double calc(int N) {
         double w;
 
         w = 1.0 / (double) N;
-        sum = 0.0;
+        double sum = 0.0;
         for (int i = PCJ.myId() + 1; i <= N; i += PCJ.threadCount()) {
             sum = sum + f(((double) i - 0.5) * w);
         }
         sum = sum * w;
+        PCJ.putLocal(SharedEnum.sum, sum);
 
         PCJ.barrier();
         if (PCJ.myId() == 0) {
-            FutureObject[] data = new FutureObject[PCJ.threadCount()];
+            PcjFuture<Double>[] data = new PcjFuture[PCJ.threadCount()];
             for (int i = 1; i < PCJ.threadCount(); ++i) {
-                data[i] = PCJ.getFutureObject(i, "sum");
+                data[i] = PCJ.asyncGet(i, SharedEnum.sum);
             }
             for (int i = 1; i < PCJ.threadCount(); ++i) {
-                sum = sum + (double) data[i].getObject();
+                sum = sum + data[i].get();
             }
 
             return sum;
