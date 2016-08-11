@@ -23,19 +23,37 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.pcj.tests.app.raytracer;
+package org.pcj.tests;
 
+import java.io.IOException;
+import org.pcj.NodesDescription;
+import org.pcj.PCJ;
 import org.pcj.StartPoint;
-import org.pcj.tests.app.raytracer.RayTracerBench;
 
 /**
  *
  * @author faramir
  */
-public class RayTracerB implements StartPoint {
+public class HelloWorldExample implements StartPoint {
+
+    public static void main(String[] args) throws IOException {
+        String nodesFile;
+        if (args.length == 0) {
+            nodesFile = "nodes.txt";
+        } else {
+            nodesFile = args[0];
+        }
+
+        PCJ.deploy(HelloWorldExample.class, new NodesDescription(nodesFile));
+    }
 
     @Override
     public void main() throws Throwable {
-        new RayTracerBench().run(1);
+        for (int i = 0; i < PCJ.threadCount(); ++i) {
+            if (PCJ.myId() == i) {
+                System.out.println("Hello World from PCJ Thread " + PCJ.myId());
+            }
+            PCJ.barrier();
+        }
     }
 }
