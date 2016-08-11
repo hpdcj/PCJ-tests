@@ -23,31 +23,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.pcj.tests.app;
+package org.pcj.examples;
 
+import org.pcj.NodesDescription;
 import org.pcj.PCJ;
 import org.pcj.PcjFuture;
 import org.pcj.Shared;
 import org.pcj.StartPoint;
+import static org.pcj.examples.PiCalcIntegral.SharedEnum.*;
 
 /**
  *
  * @author faramir
  */
-public class PiInt implements StartPoint {
+public class PiCalcIntegral implements StartPoint {
 
     public enum SharedEnum implements Shared {
-        sum(double.class);
-        private final Class<?> type;
-
-        private SharedEnum(Class<?> type) {
-            this.type = type;
-        }
-
-        @Override
-        public Class<?> type() {
-            return type;
-        }
+        sum;
     }
 
     private double f(double x) {
@@ -56,26 +48,13 @@ public class PiInt implements StartPoint {
 
     @Override
     public void main() throws Throwable {
-        int ntimes = 100;
         int points = 100_000_000;
 
-        double pi = 0.0;
-
-        long time = System.nanoTime();
-
-        for (int i = 0; i < ntimes; ++i) {
-            pi = calc(points);
-            PCJ.barrier();
-        }
-
-        time = System.nanoTime() - time;
-        double dtime = time * 1e-9;
+        double pi = calc(points);
 
         if (PCJ.myId() == 0) {
-            validate(pi);
 
-            System.out.format("PiInt\t%5d\ttime %12.7f%n",
-                    PCJ.threadCount(), dtime);
+            System.out.format("%f%n", pi);
         }
     }
 
@@ -83,36 +62,33 @@ public class PiInt implements StartPoint {
         double w;
 
         w = 1.0 / (double) N;
-        double sum = 0.0;
+        double localSum = 0.0;
         for (int i = PCJ.myId() + 1; i <= N; i += PCJ.threadCount()) {
-            sum = sum + f(((double) i - 0.5) * w);
+            localSum = localSum + f(((double) i - 0.5) * w);
         }
-        sum = sum * w;
-        PCJ.putLocal(SharedEnum.sum, sum);
+        localSum = localSum * w;
+        PCJ.putLocal(sum, localSum);
 
         PCJ.barrier();
         if (PCJ.myId() == 0) {
             PcjFuture<Double>[] data = new PcjFuture[PCJ.threadCount()];
             for (int i = 1; i < PCJ.threadCount(); ++i) {
-                data[i] = PCJ.asyncGet(i, SharedEnum.sum);
+                data[i] = PCJ.asyncGet(i, sum);
             }
             for (int i = 1; i < PCJ.threadCount(); ++i) {
-                sum = sum + data[i].get();
+                localSum = localSum + data[i].get();
             }
 
-            return sum;
+            return localSum;
         } else {
             return Double.NaN;
         }
     }
 
-    private void validate(double pi) {
-        double refval = Math.PI;
-        double dev = Math.abs(pi - refval);
-
-        if (dev > 1.0e-5) {
-            System.err.println("Validation failed");
-            System.err.println("Value = " + pi + "  " + dev);
-        }
+    public static void main(String[] args) {
+        PCJ.deploy(PiCalcIntegral.class,
+                new NodesDescription(
+                        new String[]{"localhost", "localhost", "localhost"}),
+                SharedEnum.class);
     }
 }
