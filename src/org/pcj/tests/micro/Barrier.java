@@ -32,11 +32,6 @@ public class Barrier implements org.pcj.StartPoint {
 
     public enum EmptyStorage implements Shared {
         ;
-
-        @Override
-        public Class<?> type() {
-            return null;
-        }
     }
 
     @Override
