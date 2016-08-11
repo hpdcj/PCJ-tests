@@ -48,7 +48,6 @@ public class PingPong implements StartPoint {
 
         final int ntimes = 100;
         final int number_of_tests = 5;
-        double[] b;
 
         for (int j = 0; j < transmit.length; j++) {
             int n = transmit[j];
@@ -57,7 +56,7 @@ public class PingPong implements StartPoint {
             }
 
             double[] a = new double[n];
-            b = new double[n];
+            double[] b = new double[n];
 
             g.asyncBarrier().get();
 
@@ -109,6 +108,11 @@ public class PingPong implements StartPoint {
                     tmin_put = dtime;
                 }
             }
+            
+            
+            /* in putB we use waitFor, so we have to use PCJ.monitor to clear modification count */
+            PCJ.monitor(SharedEnum.a);
+            
             g.asyncBarrier().get();
 
             // putB
