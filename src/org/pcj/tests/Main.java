@@ -43,15 +43,13 @@ public class Main {
 
         MainArgs mainArgs = new MainArgs(args);
 
-        if (mainArgs.getStartPoint() == null || mainArgs.getStorage() == null) {
+        if (mainArgs.getStartPoint() == null) {
             System.err.println("Unknown task: " + args[0]);
             System.exit(2);
         }
 
         try {
-            PCJ.start(mainArgs.getStartPoint(),
-                    new NodesDescription(mainArgs.getNodes()),
-                    mainArgs.getStorage());
+            PCJ.start(mainArgs.getStartPoint(), new NodesDescription(mainArgs.getNodes()));
         } catch (NullPointerException ex) {
             System.err.println("Used nodes: " + Arrays.toString(mainArgs.getNodes()));
             throw ex;

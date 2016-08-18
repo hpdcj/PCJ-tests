@@ -28,19 +28,23 @@ package org.pcj.examples;
 import org.pcj.NodesDescription;
 import org.pcj.PCJ;
 import org.pcj.PcjFuture;
-import org.pcj.Shared;
+import org.pcj.RegisterStorages;
 import org.pcj.StartPoint;
-import static org.pcj.examples.PiCalcIntegral.SharedEnum.*;
+import org.pcj.Storage;
+import org.pcj.examples.PiCalcIntegral.Shared;
 
 /**
  *
  * @author faramir
  */
+@RegisterStorages(Shared.class)
 public class PiCalcIntegral implements StartPoint {
 
-    public enum SharedEnum implements Shared {
+    @Storage(PiCalcIntegral.class)
+    public enum Shared {
         sum;
     }
+    double sum;
 
     private double f(double x) {
         return (4.0 / (1.0 + x * x));
@@ -62,24 +66,23 @@ public class PiCalcIntegral implements StartPoint {
         double w;
 
         w = 1.0 / (double) N;
-        double localSum = 0.0;
+        sum = 0.0;
         for (int i = PCJ.myId() + 1; i <= N; i += PCJ.threadCount()) {
-            localSum = localSum + f(((double) i - 0.5) * w);
+            sum = sum + f(((double) i - 0.5) * w);
         }
-        localSum = localSum * w;
-        PCJ.putLocal(sum, localSum);
+        sum = sum * w;
 
         PCJ.barrier();
         if (PCJ.myId() == 0) {
             PcjFuture<Double>[] data = new PcjFuture[PCJ.threadCount()];
             for (int i = 1; i < PCJ.threadCount(); ++i) {
-                data[i] = PCJ.asyncGet(i, sum);
+                data[i] = PCJ.asyncGet(i, Shared.sum);
             }
             for (int i = 1; i < PCJ.threadCount(); ++i) {
-                localSum = localSum + data[i].get();
+                sum = sum + data[i].get();
             }
 
-            return localSum;
+            return sum;
         } else {
             return Double.NaN;
         }
@@ -87,8 +90,6 @@ public class PiCalcIntegral implements StartPoint {
 
     public static void main(String[] args) {
         PCJ.deploy(PiCalcIntegral.class,
-                new NodesDescription(
-                        new String[]{"localhost", "localhost", "localhost"}),
-                SharedEnum.class);
+                new NodesDescription(new String[]{"localhost", "localhost", "localhost"}));
     }
 }

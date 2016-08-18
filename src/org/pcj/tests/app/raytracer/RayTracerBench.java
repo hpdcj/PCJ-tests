@@ -27,6 +27,7 @@
 package org.pcj.tests.app.raytracer;
 
 import org.pcj.PCJ;
+import org.pcj.tests.app.raytracer.RayTracerStorage.Shared;
 
 /**
  *
@@ -264,21 +265,21 @@ public class RayTracerBench {
 //        if (PCJ.myId() == 0) {
 //            checksum = (long) tmp_checksum[0];
 //        }
-        PCJ.put(0, RayTracerStorage.r_checksum, checksum, PCJ.myId());
-        PCJ.put(0, RayTracerStorage.r_p_row, p_row, PCJ.myId());
+        PCJ.put(0, Shared.r_checksum, checksum, PCJ.myId());
+        PCJ.put(0, Shared.r_p_row, p_row, PCJ.myId());
         if (PCJ.myId() == 0) {
-            PCJ.waitFor(RayTracerStorage.r_checksum, PCJ.threadCount());
+            PCJ.waitFor(Shared.r_checksum, PCJ.threadCount());
 
             checksum = 0;
-            long[] r_checksum = PCJ.getLocal(RayTracerStorage.r_checksum);
+            long[] r_checksum = PCJ.getLocal(Shared.r_checksum);
             for (long tmp : r_checksum) {
                 checksum += tmp;
             }
             /*
              * send temporary copies of p_row back to row
              */
-            PCJ.waitFor(RayTracerStorage.r_p_row, PCJ.threadCount());
-            int[][] r_p_row = PCJ.getLocal(RayTracerStorage.r_p_row);
+            PCJ.waitFor(Shared.r_p_row, PCJ.threadCount());
+            int[][] r_p_row = PCJ.getLocal(Shared.r_p_row);
 
             for (int k = 0; k < PCJ.threadCount(); k++) {
                 p_row = r_p_row[k];
@@ -462,11 +463,11 @@ public class RayTracerBench {
         // set image size
         width = height = datasizes[size];
         if (PCJ.myId() == 0) {
-            PCJ.putLocal(RayTracerStorage.r_checksum, new long[PCJ.threadCount()]);
-            PCJ.putLocal(RayTracerStorage.r_p_row, new int[PCJ.threadCount()][0]);
+            PCJ.putLocal(Shared.r_checksum, new long[PCJ.threadCount()]);
+            PCJ.putLocal(Shared.r_p_row, new int[PCJ.threadCount()][0]);
 
-            PCJ.monitor(RayTracerStorage.r_checksum);
-            PCJ.monitor(RayTracerStorage.r_p_row);
+            PCJ.monitor(Shared.r_checksum);
+            PCJ.monitor(Shared.r_p_row);
         }
 
         // create the objects to be rendered

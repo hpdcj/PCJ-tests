@@ -27,28 +27,23 @@ package org.pcj.tests.app;
 
 import org.pcj.PCJ;
 import org.pcj.PcjFuture;
-import org.pcj.Shared;
+import org.pcj.RegisterStorages;
 import org.pcj.StartPoint;
+import org.pcj.Storage;
+import org.pcj.tests.app.PiInt.Shared;
 
 /**
  *
  * @author faramir
  */
+@RegisterStorages(Shared.class)
 public class PiInt implements StartPoint {
 
-    public enum SharedEnum implements Shared {
-        sum(double.class);
-        private final Class<?> type;
-
-        private SharedEnum(Class<?> type) {
-            this.type = type;
-        }
-
-        @Override
-        public Class<?> type() {
-            return type;
-        }
+    @Storage(PiInt.class)
+    public enum Shared {
+        sum
     }
+    double sum;
 
     private double f(double x) {
         return (4.0 / (1.0 + x * x));
@@ -83,18 +78,17 @@ public class PiInt implements StartPoint {
         double w;
 
         w = 1.0 / (double) N;
-        double sum = 0.0;
+        sum = 0.0;
         for (int i = PCJ.myId() + 1; i <= N; i += PCJ.threadCount()) {
             sum = sum + f(((double) i - 0.5) * w);
         }
         sum = sum * w;
-        PCJ.putLocal(SharedEnum.sum, sum);
 
         PCJ.barrier();
         if (PCJ.myId() == 0) {
             PcjFuture<Double>[] data = new PcjFuture[PCJ.threadCount()];
             for (int i = 1; i < PCJ.threadCount(); ++i) {
-                data[i] = PCJ.asyncGet(i, SharedEnum.sum);
+                data[i] = PCJ.asyncGet(i, Shared.sum);
             }
             for (int i = 1; i < PCJ.threadCount(); ++i) {
                 sum = sum + data[i].get();

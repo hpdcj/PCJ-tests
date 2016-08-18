@@ -26,13 +26,8 @@
 package org.pcj.tests.micro;
 
 import org.pcj.PCJ;
-import org.pcj.Shared;
 
 public class Barrier implements org.pcj.StartPoint {
-
-    public enum EmptyStorage implements Shared {
-        ;
-    }
 
     @Override
     public void main() {

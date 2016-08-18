@@ -25,6 +25,7 @@
  */
 package org.pcj.tests.app.raytracer;
 
+import org.pcj.RegisterStorages;
 import org.pcj.StartPoint;
 import org.pcj.tests.app.raytracer.RayTracerBench;
 
@@ -32,6 +33,7 @@ import org.pcj.tests.app.raytracer.RayTracerBench;
  *
  * @author faramir
  */
+@RegisterStorages(RayTracerStorage.Shared.class)
 public class RayTracerC implements StartPoint {
 
     @Override

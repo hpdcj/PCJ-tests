@@ -29,24 +29,19 @@ package org.pcj.tests.micro;
  * @author Piotr
  */
 import org.pcj.PCJ;
-import org.pcj.Shared;
+import org.pcj.RegisterStorages;
 import org.pcj.StartPoint;
+import org.pcj.Storage;
+import org.pcj.tests.micro.Broadcast.SharedEnum;
 
+@RegisterStorages(SharedEnum.class)
 public class Broadcast implements StartPoint {
 
-    public enum SharedEnum implements Shared {
-        a(double[].class);
-        private final Class<?> type;
-
-        private SharedEnum(Class<?> type) {
-            this.type = type;
-        }
-
-        @Override
-        public Class<?> type() {
-            return type;
-        }
+    @Storage(Broadcast.class)
+    public enum SharedEnum {
+        a
     }
+    double[] a;
 
     @Override
     public void main() {

@@ -25,8 +25,10 @@
  */
 package org.pcj.tests.app.moldyn;
 
+import org.pcj.RegisterStorages;
 import org.pcj.StartPoint;
 
+@RegisterStorages({MolDynStorage.Shared.class, MolDynStorage.Reduce.class})
 public class MolDynB implements StartPoint {
 
     @Override

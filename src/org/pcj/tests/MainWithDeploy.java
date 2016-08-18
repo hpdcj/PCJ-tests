@@ -58,13 +58,11 @@ public class MainWithDeploy {
 
         MainArgs mainArgs = new MainArgs(args);
 
-        if (mainArgs.getStartPoint() == null || mainArgs.getStorage() == null) {
+        if (mainArgs.getStartPoint() == null) {
             System.err.println("Unknown task: " + args[0]);
             System.exit(2);
         }
 
-        PCJ.deploy(mainArgs.getStartPoint(),
-                new NodesDescription(mainArgs.getNodes()),
-                mainArgs.getStorage());
+        PCJ.deploy(mainArgs.getStartPoint(), new NodesDescription(mainArgs.getNodes()));
     }
 }

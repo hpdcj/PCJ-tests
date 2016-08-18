@@ -30,24 +30,19 @@ package org.pcj.tests.micro;
  */
 import org.pcj.Group;
 import org.pcj.PCJ;
-import org.pcj.Shared;
+import org.pcj.RegisterStorages;
 import org.pcj.StartPoint;
+import org.pcj.Storage;
+import org.pcj.tests.micro.PingPong.Shared;
 
+@RegisterStorages(Shared.class)
 public class PingPong implements StartPoint {
 
-    public enum SharedEnum implements Shared {
-        a(double[].class);
-        private final Class<?> type;
-
-        private SharedEnum(Class<?> type) {
-            this.type = type;
-        }
-
-        @Override
-        public Class<?> type() {
-            return type;
-        }
+    @Storage(PingPong.class)
+    public enum Shared {
+        a
     }
+    double[] a;
 
     @Override
     public void main() {
@@ -80,7 +75,7 @@ public class PingPong implements StartPoint {
                 System.err.println("n=" + n);
             }
 
-            double[] a = new double[n];
+            a = new double[n];
             double[] b = new double[n];
 
             g.asyncBarrier().get();
@@ -88,7 +83,6 @@ public class PingPong implements StartPoint {
             for (int i = 0; i < n; i++) {
                 a[i] = (double) i + 1;
             }
-            PCJ.putLocal(SharedEnum.a, a);
             g.asyncBarrier().get();
 
             //get 
@@ -97,7 +91,7 @@ public class PingPong implements StartPoint {
                 long time = System.nanoTime();
                 for (int i = 0; i < ntimes; i++) {
                     if (g.myId() == 0) {
-                        b = g.<double[]>asyncGet(1, SharedEnum.a).get();
+                        b = g.<double[]>asyncGet(1, Shared.a).get();
                     }
                 }
                 time = System.nanoTime() - time;
@@ -121,7 +115,7 @@ public class PingPong implements StartPoint {
                 long time = System.nanoTime();
                 for (int i = 0; i < ntimes; i++) {
                     if (g.myId() == 0) {
-                        g.asyncPut(1, SharedEnum.a, b).get();
+                        g.asyncPut(1, Shared.a, b).get();
                     }
                 }
 
@@ -136,7 +130,7 @@ public class PingPong implements StartPoint {
             
             
             /* in putB we use waitFor, so we have to use PCJ.monitor to clear modification count */
-            PCJ.monitor(SharedEnum.a);
+            PCJ.monitor(Shared.a);
             
             g.asyncBarrier().get();
 
@@ -150,9 +144,9 @@ public class PingPong implements StartPoint {
                 long time = System.nanoTime();
                 for (int i = 0; i < ntimes; i++) {
                     if (g.myId() == i % 2) {
-                        g.asyncPut((i + 1) % 2, SharedEnum.a, b);
+                        g.asyncPut((i + 1) % 2, Shared.a, b);
                     } else {
-                        PCJ.waitFor(SharedEnum.a);
+                        PCJ.waitFor(Shared.a);
                     }
                 }
 

@@ -25,24 +25,20 @@
  */
 package org.pcj.tests.app.raytracer;
 
-import org.pcj.Shared;
+import org.pcj.Storage;
 
 /**
  *
  * @author faramir
  */
-public enum RayTracerStorage implements Shared {
+public class RayTracerStorage {
 
-    r_checksum(long[].class),
-    r_p_row(int[][].class);
-    private final Class<?> type;
+    long[] r_checksum;
+    int[][] r_p_row;
 
-    private RayTracerStorage(Class<?> type) {
-        this.type = type;
-    }
-
-    @Override
-    public Class<?> type() {
-        return type;
+    @Storage(RayTracerStorage.class)
+    public enum Shared {
+        r_checksum,
+        r_p_row;
     }
 }

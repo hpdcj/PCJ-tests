@@ -28,13 +28,16 @@ package org.pcj.tests;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.pcj.Group;
 import org.pcj.PCJ;
-import org.pcj.Shared;
+import org.pcj.RegisterStorages;
 import org.pcj.StartPoint;
+import org.pcj.Storage;
+import org.pcj.tests.EasyTest.Shared;
 
 /**
  *
  * @author faramir
  */
+@RegisterStorages(Shared.class)
 public class EasyTest implements StartPoint {
 
     private static final AtomicInteger minThreadIdOnNode = new AtomicInteger(Integer.MAX_VALUE);
@@ -42,19 +45,11 @@ public class EasyTest implements StartPoint {
     /*
      * Shared fields
      */
-    public enum SharedEnum implements Shared {
-        A(int.class);
-        private final Class<?> type;
-
-        private SharedEnum(Class<?> type) {
-            this.type = type;
-        }
-
-        @Override
-        public Class<?> type() {
-            return type;
-        }
+    @Storage(EasyTest.class)
+    public enum Shared {
+        A;
     }
+    int A;
 
     @SuppressWarnings("method")
     @Override
@@ -80,7 +75,7 @@ public class EasyTest implements StartPoint {
         System.out.println("In group '" + g.getGroupName() + "': " + g.threadCount() + " [groupId:" + g.myId() + "/globalId:" + PCJ.myId() + "]");
         if (PCJ.myId() == 0) {
             System.out.println("broadcasting...");
-            PCJ.broadcast(SharedEnum.A, 0b010101);
+            PCJ.broadcast(Shared.A, 0b010101);
             System.out.println("syncWith(1)");
             PCJ.barrier(1);
             System.out.println("synced(1)");
@@ -112,7 +107,7 @@ public class EasyTest implements StartPoint {
                     //for (int i = 1; i < PCJ.numNodes(); ++i) {
                     //System.err.println("["+j+"]"+"0: sync "+(j%2+1));
                     PCJ.barrier(j % 2 + 1);
-                    PCJ.waitFor(SharedEnum.A);
+                    PCJ.waitFor(Shared.A);
                     //System.err.println("["+j+"]"+PCJ.myNode()+": waitFor(A)");
 
                     //System.err.println("["+j+"]"+"0: synced "+(j%2+1));
@@ -120,7 +115,7 @@ public class EasyTest implements StartPoint {
                 } else if (PCJ.myId() == j % 2 + 1) {
                     //System.err.println("["+j+"]"+PCJ.myNode()+": sync 0");
                     PCJ.barrier(0);
-                    PCJ.put(0, SharedEnum.A, j);
+                    PCJ.put(0, Shared.A, j);
                     //System.err.println("["+j+"]"+PCJ.myNode()+": putLocal(A)");
 
                     //System.err.println("["+j+"]"+PCJ.myNode()+": synced 0");
@@ -132,51 +127,22 @@ public class EasyTest implements StartPoint {
 
         System.out.printf("[%d] bef sync\n", PCJ.myId());
         PCJ.barrier();
-        System.out.printf("[%d] A=%d\n", PCJ.myId(), PCJ.getLocal(SharedEnum.A));
+        System.out.printf("[%d] A=%d\n", PCJ.myId(), A);
 
         if (PCJ.threadCount() >= 2 && PCJ.myId() == 0) {
             System.out.println("Put 0x10 by 0 to node 1 to variable 'A'");
-            PCJ.put(1, SharedEnum.A, 0x10);
+            PCJ.put(1, Shared.A, 0x10);
         }
 
         PCJ.barrier();
-        System.out.printf("[%d] A=%d\n", PCJ.myId(), PCJ.getLocal(SharedEnum.A));
+        System.out.printf("[%d] A=%d\n", PCJ.myId(), A);
 
         if (PCJ.threadCount() >= 2 && PCJ.myId() == 0) {
             System.out.println("Get 'A' by 0 from 1");
-            PCJ.putLocal(SharedEnum.A, PCJ.asyncGet(1, SharedEnum.A).get());
+            A = PCJ.<Integer>asyncGet(1, Shared.A).get();
         }
 
         PCJ.barrier();
-        System.out.printf("[%d] A=%d\n", PCJ.myId(), PCJ.getLocal(SharedEnum.A));
-//        PCJ.putLocal((PCJ.myNode() + 1) % PCJ.numNodes(), SharedEnum.A, PCJ.myNode());
-//        PCJ.sync();
-//        System.out.printf("[%d] A=%d\n", PCJ.myNode(), PCJ.getLocal(SharedEnum.A));
-//        PCJ.sync();
-//        if (PCJ.myNode() == 0) {
-//            System.out.println("---");
-//        }
-//        PCJ.sync();
-//        System.out.printf("[%d] A=%d\n", PCJ.myNode(), PCJ.getLocal(SharedEnum.A));
-//        PCJ.putLocal(SharedEnum.A, A * A+1);
-//        PCJ.sync();
-//        if (PCJ.myNode() == 0) {
-//            System.out.println("---");
-//        }
-//        PCJ.sync();
-//        System.out.printf("[%d] A=%d\n", PCJ.myNode(), PCJ.getLocal((PCJ.myNode() + 1) % PCJ.numNodes(), SharedEnum.A));
-//        PCJ.sync();
-//        if (PCJ.myNode() == 0) {
-//            System.out.println("---");
-//            PCJ.broadcast(SharedEnum.A, 0x10);
-//        }
-//        PCJ.sync();
-//        System.out.printf("[%d] A=%d\n", PCJ.myNode(), PCJ.getLocal(SharedEnum.A));
-//        PCJ.sync();
-//        if (PCJ.myNode() == 0) {
-//            System.out.println("---");
-//        }
-//        PCJ.sync();
-//        System.out.printf("[%d] A=%d\n", PCJ.myNode(), PCJ.getLocal(SharedEnum.A));
+        System.out.printf("[%d] A=%d\n", PCJ.myId(), A);
     }
 }

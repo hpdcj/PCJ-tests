@@ -28,24 +28,19 @@ package org.pcj.tests.app;
 import java.util.Random;
 import org.pcj.PCJ;
 import org.pcj.PcjFuture;
-import org.pcj.Shared;
+import org.pcj.RegisterStorages;
 import org.pcj.StartPoint;
+import org.pcj.Storage;
+import org.pcj.tests.app.PiMC.Shared;
 
+@RegisterStorages(Shared.class)
 public class PiMC implements StartPoint {
 
-    public enum SharedEnum implements Shared {
-        circleCount(long.class);
-        private final Class<?> type;
-
-        private SharedEnum(Class<?> type) {
-            this.type = type;
-        }
-
-        @Override
-        public Class<?> type() {
-            return type;
-        }
+    @Storage(PiMC.class)
+    public enum Shared {
+        circleCount
     }
+    long circleCount;
 
     @Override
     public void main() {
@@ -53,7 +48,7 @@ public class PiMC implements StartPoint {
         long nAll = 512_000_000;
         long n = nAll / PCJ.threadCount();
 
-        long circleCount = 0;
+        circleCount = 0;
         long time = System.nanoTime();
 
         // Calculate  
@@ -64,7 +59,7 @@ public class PiMC implements StartPoint {
                 circleCount++;
             }
         }
-        PCJ.putLocal(SharedEnum.circleCount, circleCount);
+        
         PCJ.barrier();
 
         // Gather results 
@@ -73,7 +68,7 @@ public class PiMC implements StartPoint {
 
         if (PCJ.myId() == 0) {
             for (int p = 0; p < PCJ.threadCount(); p++) {
-                cL[p] = PCJ.asyncGet(p, SharedEnum.circleCount);
+                cL[p] = PCJ.asyncGet(p, Shared.circleCount);
             }
             for (int p = 0; p < PCJ.threadCount(); p++) {
                 c = c + (long) cL[p].get();
