@@ -222,13 +222,13 @@ public class MolDynBench {
 //            MPI.COMM_WORLD.Allreduce(tmp_yforce, 0, tmp_yforce, 0, mdsize, MPI.DOUBLE, MPI.SUM);
 //            MPI.COMM_WORLD.Allreduce(tmp_zforce, 0, tmp_zforce, 0, mdsize, MPI.DOUBLE, MPI.SUM);
             if (PCJ.myId() != 0) {
-                PCJ.put(0, Reduce.r_epot, epot, PCJ.myId());
-                PCJ.put(0, Reduce.r_vir, vir, PCJ.myId());
-                PCJ.put(0, Reduce.r_interactions, interactions, PCJ.myId());
+                PCJ.put(epot, 0, Reduce.r_epot, PCJ.myId());
+                PCJ.put(vir, 0, Reduce.r_vir, PCJ.myId());
+                PCJ.put(interactions, 0, Reduce.r_interactions, PCJ.myId());
 
-                PCJ.put(0, Reduce.r_xforce, tmp_xforce, PCJ.myId());
-                PCJ.put(0, Reduce.r_yforce, tmp_yforce, PCJ.myId());
-                PCJ.put(0, Reduce.r_zforce, tmp_zforce, PCJ.myId());
+                PCJ.put(tmp_xforce, 0, Reduce.r_xforce, PCJ.myId());
+                PCJ.put(tmp_yforce, 0, Reduce.r_yforce, PCJ.myId());
+                PCJ.put(tmp_zforce, 0, Reduce.r_zforce, PCJ.myId());
             } else {
                 PCJ.waitFor(Reduce.r_epot, PCJ.threadCount() - 1);
                 PCJ.waitFor(Reduce.r_vir, PCJ.threadCount() - 1);
@@ -242,9 +242,9 @@ public class MolDynBench {
                     vir += r_vir[node];
                     interactions += r_interactions[node];
                 }
-                PCJ.broadcast(Shared.tmp_epot, epot);
-                PCJ.broadcast(Shared.tmp_vir, vir);
-                PCJ.broadcast(Shared.tmp_interactions, interactions);
+                PCJ.broadcast(epot, Shared.tmp_epot);
+                PCJ.broadcast(vir, Shared.tmp_vir);
+                PCJ.broadcast(interactions, Shared.tmp_interactions);
 
                 PCJ.waitFor(Reduce.r_xforce, PCJ.threadCount() - 1);
                 PCJ.waitFor(Reduce.r_yforce, PCJ.threadCount() - 1);
@@ -261,9 +261,9 @@ public class MolDynBench {
                         tmp_zforce[i] += r_zforce[node][i];
                     }
                 }
-                PCJ.broadcast(Shared.tmp_xforce, tmp_xforce);
-                PCJ.broadcast(Shared.tmp_yforce, tmp_yforce);
-                PCJ.broadcast(Shared.tmp_zforce, tmp_zforce);
+                PCJ.broadcast(tmp_xforce, Shared.tmp_xforce);
+                PCJ.broadcast(tmp_yforce, Shared.tmp_yforce);
+                PCJ.broadcast(tmp_zforce, Shared.tmp_zforce);
             }
 
             PCJ.waitFor(Shared.tmp_epot);

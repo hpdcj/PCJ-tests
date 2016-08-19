@@ -115,7 +115,7 @@ public class PingPong implements StartPoint {
                 long time = System.nanoTime();
                 for (int i = 0; i < ntimes; i++) {
                     if (g.myId() == 0) {
-                        g.asyncPut(1, Shared.a, b).get();
+                        g.asyncPut(b, 1, Shared.a).get();
                     }
                 }
 
@@ -144,7 +144,7 @@ public class PingPong implements StartPoint {
                 long time = System.nanoTime();
                 for (int i = 0; i < ntimes; i++) {
                     if (g.myId() == i % 2) {
-                        g.asyncPut((i + 1) % 2, Shared.a, b);
+                        g.asyncPut(b, (i + 1) % 2, Shared.a);
                     } else {
                         PCJ.waitFor(Shared.a);
                     }

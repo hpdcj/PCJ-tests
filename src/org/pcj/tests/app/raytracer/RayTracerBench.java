@@ -265,8 +265,8 @@ public class RayTracerBench {
 //        if (PCJ.myId() == 0) {
 //            checksum = (long) tmp_checksum[0];
 //        }
-        PCJ.put(0, Shared.r_checksum, checksum, PCJ.myId());
-        PCJ.put(0, Shared.r_p_row, p_row, PCJ.myId());
+        PCJ.put(checksum, 0, Shared.r_checksum, PCJ.myId());
+        PCJ.put(p_row, 0, Shared.r_p_row, PCJ.myId());
         if (PCJ.myId() == 0) {
             PCJ.waitFor(Shared.r_checksum, PCJ.threadCount());
 
