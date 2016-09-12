@@ -28,16 +28,16 @@ package org.pcj.tests;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.pcj.Group;
 import org.pcj.PCJ;
-import org.pcj.RegisterStorages;
 import org.pcj.StartPoint;
 import org.pcj.Storage;
 import org.pcj.tests.EasyTest.Shared;
+import org.pcj.RegisterStorage;
 
 /**
  *
  * @author faramir
  */
-@RegisterStorages(Shared.class)
+@RegisterStorage(Shared.class)
 public class EasyTest implements StartPoint {
 
     private static final AtomicInteger minThreadIdOnNode = new AtomicInteger(Integer.MAX_VALUE);

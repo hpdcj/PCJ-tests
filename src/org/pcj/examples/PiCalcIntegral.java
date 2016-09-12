@@ -28,16 +28,16 @@ package org.pcj.examples;
 import org.pcj.NodesDescription;
 import org.pcj.PCJ;
 import org.pcj.PcjFuture;
-import org.pcj.RegisterStorages;
 import org.pcj.StartPoint;
 import org.pcj.Storage;
 import org.pcj.examples.PiCalcIntegral.Shared;
+import org.pcj.RegisterStorage;
 
 /**
  *
  * @author faramir
  */
-@RegisterStorages(Shared.class)
+@RegisterStorage(Shared.class)
 public class PiCalcIntegral implements StartPoint {
 
     @Storage(PiCalcIntegral.class)

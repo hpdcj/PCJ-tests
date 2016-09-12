@@ -27,16 +27,16 @@ package org.pcj.tests.app;
 
 import org.pcj.PCJ;
 import org.pcj.PcjFuture;
-import org.pcj.RegisterStorages;
 import org.pcj.StartPoint;
 import org.pcj.Storage;
 import org.pcj.tests.app.PiInt.Shared;
+import org.pcj.RegisterStorage;
 
 /**
  *
  * @author faramir
  */
-@RegisterStorages(Shared.class)
+@RegisterStorage(Shared.class)
 public class PiInt implements StartPoint {
 
     @Storage(PiInt.class)

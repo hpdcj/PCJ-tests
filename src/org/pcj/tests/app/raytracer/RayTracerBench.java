@@ -27,6 +27,7 @@
 package org.pcj.tests.app.raytracer;
 
 import org.pcj.PCJ;
+import org.pcj.PcjRuntimeException;
 import org.pcj.tests.app.raytracer.RayTracerStorage.Shared;
 
 /**
@@ -265,11 +266,10 @@ public class RayTracerBench {
 //        if (PCJ.myId() == 0) {
 //            checksum = (long) tmp_checksum[0];
 //        }
-        PCJ.put(checksum, 0, Shared.r_checksum, PCJ.myId());
-        PCJ.put(p_row, 0, Shared.r_p_row, PCJ.myId());
+        PCJ.asyncPut(checksum, 0, Shared.r_checksum, PCJ.myId());
+        PCJ.asyncPut(p_row, 0, Shared.r_p_row, PCJ.myId());
         if (PCJ.myId() == 0) {
             PCJ.waitFor(Shared.r_checksum, PCJ.threadCount());
-
             checksum = 0;
             long[] r_checksum = PCJ.getLocal(Shared.r_checksum);
             for (long tmp : r_checksum) {
@@ -312,7 +312,7 @@ public class RayTracerBench {
                 nhits++;
             }
         }
-        return nhits > 0 ? true : false;
+        return nhits > 0;
     }
 
     /**

@@ -30,12 +30,12 @@ package org.pcj.tests.micro;
  */
 import org.pcj.Group;
 import org.pcj.PCJ;
-import org.pcj.RegisterStorages;
 import org.pcj.StartPoint;
 import org.pcj.Storage;
 import org.pcj.tests.micro.PingPong.Shared;
+import org.pcj.RegisterStorage;
 
-@RegisterStorages(Shared.class)
+@RegisterStorage(Shared.class)
 public class PingPong implements StartPoint {
 
     @Storage(PingPong.class)

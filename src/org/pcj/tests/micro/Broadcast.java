@@ -29,12 +29,12 @@ package org.pcj.tests.micro;
  * @author Piotr
  */
 import org.pcj.PCJ;
-import org.pcj.RegisterStorages;
 import org.pcj.StartPoint;
 import org.pcj.Storage;
 import org.pcj.tests.micro.Broadcast.SharedEnum;
+import org.pcj.RegisterStorage;
 
-@RegisterStorages(SharedEnum.class)
+@RegisterStorage(SharedEnum.class)
 public class Broadcast implements StartPoint {
 
     @Storage(Broadcast.class)

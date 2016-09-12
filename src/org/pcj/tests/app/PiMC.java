@@ -28,12 +28,12 @@ package org.pcj.tests.app;
 import java.util.Random;
 import org.pcj.PCJ;
 import org.pcj.PcjFuture;
-import org.pcj.RegisterStorages;
 import org.pcj.StartPoint;
 import org.pcj.Storage;
 import org.pcj.tests.app.PiMC.Shared;
+import org.pcj.RegisterStorage;
 
-@RegisterStorages(Shared.class)
+@RegisterStorage(Shared.class)
 public class PiMC implements StartPoint {
 
     @Storage(PiMC.class)
