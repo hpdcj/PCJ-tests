@@ -71,21 +71,21 @@ public class PingPong implements StartPoint {
 
         for (int j = 0; j < transmit.length; j++) {
             int n = transmit[j];
-            if (PCJ.myId() == 0) {
+            if (g.myId() == 0) {
                 System.err.println("n=" + n);
             }
 
             a = new double[n];
             double[] b = new double[n];
 
-            g.asyncBarrier().get();
-
             for (int i = 0; i < n; i++) {
                 a[i] = (double) i + 1;
             }
-            g.asyncBarrier().get();
 
             //get 
+            PCJ.monitor(Shared.a);
+            g.asyncBarrier().get();
+
             double tmin_get = Double.MAX_VALUE;
             for (int k = 0; k < number_of_tests; k++) {
                 long time = System.nanoTime();
@@ -102,9 +102,11 @@ public class PingPong implements StartPoint {
                     tmin_get = dtime;
                 }
             }
-            g.asyncBarrier().get();
 
             // put
+            PCJ.monitor(Shared.a);
+            g.asyncBarrier().get();
+
             for (int i = 0; i < n; i++) {
                 a[i] = 0.0d;
                 b[i] = (double) i + 1;
@@ -115,7 +117,9 @@ public class PingPong implements StartPoint {
                 long time = System.nanoTime();
                 for (int i = 0; i < ntimes; i++) {
                     if (g.myId() == 0) {
-                        g.asyncPut(b, 1, Shared.a).get();
+                        g.asyncPut(b, 1, Shared.a);
+                    } else {
+                        PCJ.waitFor(Shared.a);
                     }
                 }
 
@@ -127,14 +131,12 @@ public class PingPong implements StartPoint {
                     tmin_put = dtime;
                 }
             }
-            
-            
+
             /* in putB we use waitFor, so we have to use PCJ.monitor to clear modification count */
+            // putB
             PCJ.monitor(Shared.a);
-            
             g.asyncBarrier().get();
 
-            // putB
             for (int i = 0; i < n; i++) {
                 b[i] = (double) i + 1;
             }
