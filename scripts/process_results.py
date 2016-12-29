@@ -26,11 +26,14 @@ set pointsize 1
 
 dat=open("plot.dat","w")
 dat_input=0
+plot_num=0
 
+#---
 
+benchmarks_names = dict()
 nodesthreads_pattern = compile(r"(?P<name>\S+)\s+using:\s*(?P<nodes>\d+)\s+nodes\s*(?P<threads>\d+)\s+threads?")
 result_pattern = compile(r"(?P<name>\S+)\s+(?P<cores>\d+)\s+(size\s+(?P<size>\d+(?:\.\d*)?)\s+)?time\s+(?P<time>\d+(?:\.\d*)?)")
-result_benchmarks=sorted([name for name in listdir(".") if name.endswith(".out") and not name.startswith("pingpong")])
+result_benchmarks=sorted([name for name in listdir(".") if name.endswith(".out") and not "pingpong" in name])
 for filename in result_benchmarks:
     stderr.write("Processing file: %s..."%filename)
     if isfile(filename) == False:
@@ -87,6 +90,11 @@ for filename in result_benchmarks:
             plot_name = name
         else:
             plot_name = "%s (%.7g KB)" % (name, size)
+
+        if plot_name not in benchmarks_names:
+            benchmarks_names[plot_name] = []
+        benchmarks_names[plot_name].append((filename, dat_input))
+
         dat.write("### Input %d: %s (%s)" % (dat_input,plot_name,filename))
         dat.write("\n# Nproc\tt_min")
         for nodes in l_nodes:
@@ -115,7 +123,7 @@ for filename in result_benchmarks:
         plt.write("set xrange [0.9:%.1f]\n" % (sorted(cores_values)[-1]*1.1))
         plt.write("set xtics (%s)\n" % xtics)
         plt.write("#set key nobox at %.3f,%.3f\n" % (sorted(cores_values)[-1],0.01))
-        plt.write("set output '%s_%d.png'\n\n" % (filename[:-4], dat_input))
+        plt.write("set output '%s_%d.png'\n\n" % (filename[:-4], plot_num))
 
         plt.write("plot 'plot.dat' i %d u 1:2 t 'min' w lp lt 9 lw 2 pt 0" % dat_input) # min
 #        col = 3
@@ -140,12 +148,51 @@ for filename in result_benchmarks:
 
         plt.write("# ---^--- input: %d ---^--- \n" % dat_input)
         dat_input = dat_input + 1
+        plot_num = plot_num + 1
 
     stderr.write(" done\n")
 
+#---
 
+if len(benchmarks_names) != 0:
+    stderr.write("Generating summary graphs: ")
+    for benchmark in benchmarks_names:
+        stderr.write("%s... " % benchmark)
+        plt.write("\n\n### --- Summary: %s --- ###\n\n" % benchmark)
+
+        plt.write("# ---v--- plot: %d ---v--- \n" % plot_num)
+
+        plt.write("set title '%s'\n" % benchmark.replace('_','\_'))
+        plt.write("set xlabel 'Thread count'\n")
+        plt.write("set ylabel 'Time [s]'\n")
+        plt.write("set format y ' 10^{%T}'\n")
+        plt.write("set autoscale y\n")
+        plt.write("set xrange [0.9:%.1f]\n" % (sorted(cores_values)[-1]*1.1))
+        plt.write("set xtics (%s)\n" % xtics)
+        plt.write("#set key nobox at %.3f,%.3f\n" % (sorted(cores_values)[-1],0.01))
+        plt.write("set output '%s_%d.png'\n\n" % (benchmark, plot_num))
+
+        plt.write("plot \\\n")
+        col = 2
+        for filename,dat_input_num in benchmarks_names[benchmark]:
+            plt.write("      'plot.dat' i %d u 1:2 t '%s' w lp lt %d lw 3 pt 7,\\\n"%(
+                dat_input_num,
+                filename.replace('_','\_'),
+                col-1 # color
+            ))
+            col=col+1
+        plt.write("\n\n")
+
+        plt.write("# ---^--- plot: %d ---^--- \n" % plot_num)
+        plot_num = plot_num + 1
+
+    stderr.write(" done\n")
+
+#---
+
+benchmarks_names = dict()
 pingpong_pattern = compile(r"(?P<name>\S+)\s+(?P<cores>\d+)\s+size\s+(?P<size>\d+(?:\.\d*)?)\s+t_get\s+(?P<t_get>\d+(?:\.\d*)?)\s+t_put\s+(?P<t_put>\d+(?:\.\d*)?)\s+t_putB\s+(?P<t_putB>\d+(?:\.\d*)?)")
-pingpong_benchmarks=sorted([name for name in listdir(".") if name.endswith(".out") and name.startswith("pingpong")])
+pingpong_benchmarks=sorted([name for name in listdir(".") if name.endswith(".out") and "pingpong" in name])
 for filename in pingpong_benchmarks:
     stderr.write("Processing file: %s..."%filename)
     if isfile(filename) == False:
@@ -213,18 +260,15 @@ for filename in pingpong_benchmarks:
     plt.write("set xrange [%.7f:%.1f]\n" % (l_sizes[0]*0.9, l_sizes[-1]*1.1))
     plt.write("set xtics (%s)\n" % xtics)
     plt.write("#set key nobox at %.3f,%.3f\n" % (l_sizes[-1],0.01))
-    plt.write("set output '%s_%d.png'\n\n" % (filename[:-4], dat_input))
+    plt.write("set output '%s_%d.png'\n\n" % (filename[:-4], plot_num))
 
     col=2
-    plt.write("plot 'plot.dat' i %d u 1:%d t '%s' w lp lt %d lw 3 pt 7"%(
-        dat_input,
-        col, # column
-        l_names[0].replace('_','\_'),
-        col-1 # color
-    ))
-    col = col+1
-    for t_name in l_names[1:]:
-        plt.write(",\\\n     'plot.dat' i %d u 1:%d t '%s' w lp lt %d lw 3 pt 7"%(
+    plt.write("plot \\\n")
+    for t_name in l_names:
+        if t_name not in benchmarks_names:
+            benchmarks_names[t_name]=[]
+        benchmarks_names[t_name].append((filename,dat_input,col))
+        plt.write("     'plot.dat' i %d u 1:%d t '%s' w lp lt %d lw 3 pt 7,\\\n"%(
             dat_input,
             col, # column
             t_name.replace('_','\_'), # nodes
@@ -237,6 +281,43 @@ for filename in pingpong_benchmarks:
     dat_input = dat_input + 1
     stderr.write(" done\n")
 
+#---
+if len(benchmarks_names) != 0:
+    stderr.write("Generating summary graphs: ")
+    for benchmark in benchmarks_names:
+        stderr.write("%s... " % benchmark)
+        plt.write("\n\n### --- Summary: %s --- ###\n\n" % benchmark)
+
+        plt.write("# ---v--- plot: %d ---v--- \n" % plot_num)
+
+        plt.write("set title '%s'\n" % benchmark.replace('_','\_'))
+        plt.write("set xlabel 'Size [KB]'\n")
+        plt.write("set ylabel 'Time [s]'\n")
+        plt.write("set format y ' 10^{%T}'\n")
+        plt.write("set autoscale y\n")
+        plt.write("set xrange [%.7f:%.1f]\n" % (l_sizes[0]*0.9, l_sizes[-1]*1.1))
+        plt.write("set xtics (%s)\n" % xtics)
+        plt.write("#set key nobox at %.3f,%.3f\n" % (l_sizes[-1],0.01))
+        plt.write("set output '%s_%d.png'\n\n" % (benchmark, plot_num))
+
+        plt.write("plot \\\n")
+        col = 2
+        for filename,dat_input_num,col_num in benchmarks_names[benchmark]:
+            plt.write("      'plot.dat' i %d u 1:%d t '%s' w lp lt %d lw 3 pt 7,\\\n"%(
+                dat_input_num,
+                col_num,
+                filename.replace('_','\_'),
+                col-1 # color
+            ))
+            col=col+1
+        plt.write("\n\n")
+
+        plt.write("# ---^--- input: %d ---^--- \n" % plot_num)
+        plot_num = plot_num + 1
+
+    stderr.write(" done\n")
+
+#---
 
 
 dat.close()
