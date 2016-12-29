@@ -290,7 +290,7 @@ if len(benchmarks_names) != 0:
 
         plt.write("# ---v--- plot: %d ---v--- \n" % plot_num)
 
-        plt.write("set title '%s'\n" % benchmark.replace('_','\_'))
+        plt.write("set title 'PingPong %s'\n" % benchmark.replace('_','\_'))
         plt.write("set xlabel 'Size [KB]'\n")
         plt.write("set ylabel 'Time [s]'\n")
         plt.write("set format y ' 10^{%T}'\n")
@@ -298,7 +298,7 @@ if len(benchmarks_names) != 0:
         plt.write("set xrange [%.7f:%.1f]\n" % (l_sizes[0]*0.9, l_sizes[-1]*1.1))
         plt.write("set xtics (%s)\n" % xtics)
         plt.write("#set key nobox at %.3f,%.3f\n" % (l_sizes[-1],0.01))
-        plt.write("set output '%s_%d.png'\n\n" % (benchmark, plot_num))
+        plt.write("set output 'pingpong_%s_%d.png'\n\n" % (benchmark, plot_num))
 
         plt.write("plot \\\n")
         col = 2
