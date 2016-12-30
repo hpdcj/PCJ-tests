@@ -69,8 +69,11 @@ public class Broadcast implements StartPoint {
 
             for (int i = 0; i < ntimes; i++) {
                 if (PCJ.myId() == 0) {
-                    PCJ.broadcast(b, SharedEnum.a);
+                      PCJ.broadcast(b, SharedEnum.a);
+//                    PCJ.asyncBroadcast(b, SharedEnum.a);
                 }
+//                PCJ.waitFor(SharedEnum.a);
+//                PCJ.barrier();
             }
 
             time = System.nanoTime() - time;

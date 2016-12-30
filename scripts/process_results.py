@@ -1,3 +1,10 @@
+#!/usr/bin/python
+#
+# Author: Marek Nowicki
+# 
+# mkdir results && find . -path "./job-*" -name "*.out" -exec sh -c  'cat $0 >> results/${0##*/}' {} \;
+# 
+#
 from re import compile
 from sys import stdout, stderr
 from math import ceil
@@ -84,7 +91,7 @@ for filename in result_benchmarks:
     l_xtics = None
 
     for size,cores_values in sorted(data.items()):
-        plt.write("# ---v--- input: %d ---v--- \n" % dat_input)
+        plt.write("## ---v--- input: %d ---v--- \n" % dat_input)
 
         if size is None:
             plot_name = name
@@ -115,19 +122,19 @@ for filename in result_benchmarks:
             dat.write("\n")
         dat.write("\n\n")
 
-        plt.write("set title '%s'\n" % plot_name.replace('_','\_'))
-        plt.write("set xlabel 'Thread count'\n")
-        plt.write("set ylabel 'Time [s]'\n")
-        plt.write("set format y ' 10^{%T}'\n")
-        plt.write("set autoscale y\n")
-        plt.write("set xrange [0.9:%.1f]\n" % (sorted(cores_values)[-1]*1.1))
-        plt.write("set xtics (%s)\n" % xtics)
-        plt.write("#set key nobox at %.3f,%.3f\n" % (sorted(cores_values)[-1],0.01))
-        plt.write("set output '%s_%d.png'\n\n" % (filename[:-4], plot_num))
+        plt.write("#set title '%s'\n" % plot_name.replace('_','\_'))
+        plt.write("#set xlabel 'Thread count'\n")
+        plt.write("#set ylabel 'Time [s]'\n")
+        plt.write("#set format y ' 10^{%T}'\n")
+        plt.write("#set autoscale y\n")
+        plt.write("#set xrange [0.9:%.1f]\n" % (sorted(cores_values)[-1]*1.1))
+        plt.write("#set xtics (%s)\n" % xtics)
+        plt.write("##set key nobox at %.3f,%.3f\n" % (sorted(cores_values)[-1],0.01))
+        plt.write("#set output '%s_%d.png'\n\n" % (filename[:-4], plot_num))
 
-        plt.write("plot 'plot.dat' i %d u 1:2 t 'min' w lp lt 9 lw 2 pt 0" % dat_input) # min
+        plt.write("#plot 'plot.dat' i %d u 1:2 t 'min' w lp lt 9 lw 2 pt 0" % dat_input) # min
 #        col = 3
-#        plt.write("plot 'plot.dat' i %d u 1:%d t '%d nodes' w lp lt %d lw 3 pt 7"%(
+#        plt.write("#plot 'plot.dat' i %d u 1:%d t '%d nodes' w lp lt %d lw 3 pt 7"%(
 #            dat_input,
 #            col, # column
 #            l_nodes[0], # nodes
@@ -137,16 +144,16 @@ for filename in result_benchmarks:
 #        for nodes in l_nodes[1:]:
         col = 3
         for nodes in l_nodes:
-            plt.write(",\\\n     'plot.dat' i %d u 1:%d t '%d nodes' w lp lt %d lw 3 pt 7"%(
+            plt.write(",\\\n#     'plot.dat' i %d u 1:%d t '%d nodes' w lp lt %d lw 3 pt 7"%(
                 dat_input,
                 col, # column
                 nodes, # nodes
                 col-2 # color
             ))
             col=col+1
-        plt.write("\n\n")
+        plt.write("#\n#\n")
 
-        plt.write("# ---^--- input: %d ---^--- \n" % dat_input)
+        plt.write("## ---^--- input: %d ---^--- \n" % dat_input)
         dat_input = dat_input + 1
         plot_num = plot_num + 1
 
@@ -233,7 +240,7 @@ for filename in pingpong_benchmarks:
     xtics = (", ".join(['"%.7g" %.7f' % (x,x) for x in l_xtics]))
     l_names = sorted(s_names)
 
-    plt.write("# ---v--- input: %d ---v--- \n" % dat_input)
+    plt.write("## ---v--- input: %d ---v--- \n" % dat_input)
 
     plot_name = "%s (%s)" % (name, filename)
     dat.write("### Input %d: %s" % (dat_input,plot_name))
@@ -252,31 +259,31 @@ for filename in pingpong_benchmarks:
         dat.write("\n")
     dat.write("\n\n")
 
-    plt.write("set title '%s'\n" % plot_name.replace('_','\_'))
-    plt.write("set xlabel 'Size [KB]'\n")
-    plt.write("set ylabel 'Time [s]'\n")
-    plt.write("set format y ' 10^{%T}'\n")
-    plt.write("set autoscale y\n")
-    plt.write("set xrange [%.7f:%.1f]\n" % (l_sizes[0]*0.9, l_sizes[-1]*1.1))
-    plt.write("set xtics (%s)\n" % xtics)
-    plt.write("#set key nobox at %.3f,%.3f\n" % (l_sizes[-1],0.01))
-    plt.write("set output '%s_%d.png'\n\n" % (filename[:-4], plot_num))
+    plt.write("#set title '%s'\n" % plot_name.replace('_','\_'))
+    plt.write("#set xlabel 'Size [KB]'\n")
+    plt.write("#set ylabel 'Time [s]'\n")
+    plt.write("#set format y ' 10^{%T}'\n")
+    plt.write("#set autoscale y\n")
+    plt.write("#set xrange [%.7f:%.1f]\n" % (l_sizes[0]*0.9, l_sizes[-1]*1.1))
+    plt.write("#set xtics (%s)\n" % xtics)
+    plt.write("##set key nobox at %.3f,%.3f\n" % (l_sizes[-1],0.01))
+    plt.write("#set output '%s_%d.png'\n\n" % (filename[:-4], plot_num))
 
     col=2
-    plt.write("plot \\\n")
+    plt.write("#plot \\\n")
     for t_name in l_names:
         if t_name not in benchmarks_names:
             benchmarks_names[t_name]=[]
         benchmarks_names[t_name].append((filename,dat_input,col))
-        plt.write("     'plot.dat' i %d u 1:%d t '%s' w lp lt %d lw 3 pt 7,\\\n"%(
+        plt.write("#     'plot.dat' i %d u 1:%d t '%s' w lp lt %d lw 3 pt 7,\\\n"%(
             dat_input,
             col, # column
             t_name.replace('_','\_'), # nodes
             col-1 # color
         ))
         col=col+1
-    plt.write("\n\n")
-    plt.write("# ---^--- input: %d ---^--- \n" % dat_input)
+    plt.write("#\n#\n")
+    plt.write("## ---^--- input: %d ---^--- \n" % dat_input)
 
     dat_input = dat_input + 1
     stderr.write(" done\n")
@@ -290,7 +297,7 @@ if len(benchmarks_names) != 0:
 
         plt.write("# ---v--- plot: %d ---v--- \n" % plot_num)
 
-        plt.write("set title 'PingPong %s'\n" % benchmark.replace('_','\_'))
+        plt.write("set title '%s'\n" % benchmark.replace('_','\_'))
         plt.write("set xlabel 'Size [KB]'\n")
         plt.write("set ylabel 'Time [s]'\n")
         plt.write("set format y ' 10^{%T}'\n")
@@ -298,7 +305,7 @@ if len(benchmarks_names) != 0:
         plt.write("set xrange [%.7f:%.1f]\n" % (l_sizes[0]*0.9, l_sizes[-1]*1.1))
         plt.write("set xtics (%s)\n" % xtics)
         plt.write("#set key nobox at %.3f,%.3f\n" % (l_sizes[-1],0.01))
-        plt.write("set output 'pingpong_%s_%d.png'\n\n" % (benchmark, plot_num))
+        plt.write("set output '%s_%d.png'\n\n" % (benchmark, plot_num))
 
         plt.write("plot \\\n")
         col = 2
