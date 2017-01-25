@@ -27,10 +27,10 @@ package org.pcj.tests.app;
 
 import org.pcj.PCJ;
 import org.pcj.PcjFuture;
+import org.pcj.RegisterStorage;
 import org.pcj.StartPoint;
 import org.pcj.Storage;
 import org.pcj.tests.app.PiInt.Shared;
-import org.pcj.RegisterStorage;
 
 /**
  *
@@ -98,6 +98,10 @@ public class PiInt implements StartPoint {
         } else {
             return Double.NaN;
         }
+    }
+
+    private static void dumpStackTraces() {
+        java.util.Arrays.stream(java.lang.management.ManagementFactory.getThreadMXBean().dumpAllThreads(true, true)).forEach(System.err::println);
     }
 
     private void validate(double pi) {
