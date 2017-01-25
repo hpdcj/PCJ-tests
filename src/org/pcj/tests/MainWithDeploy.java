@@ -29,27 +29,26 @@ import org.pcj.NodesDescription;
 import org.pcj.PCJ;
 
 /**
- *
  * @author faramir
  */
 public class MainWithDeploy {
 
     public static void main(String[] args) throws Throwable {
-//            args = new String[]{"EasyTest"};
-//            args = new String[]{"PiInt"};
-//            args = new String[]{"PiMC"};
-//            args = new String[]{"Barrier"};
-//            args = new String[]{"Broadcast"};
-//            args = new String[]{"PingPong"};
-//            args = new String[]{"RayTracerA"};
-//            args = new String[]{"RayTracerB"};
-//            args = new String[]{"RayTracerC"};
-//            args = new String[]{"RayTracerD"};
-//            args = new String[]{"MolDynA"};
-//            args = new String[]{"MolDynB"};
-//            args = new String[]{"MolDynC"};
-//            args = new String[]{"MolDynD"};
-//            args = new String[]{"MolDynE"};
+//        args = new String[]{"EasyTest"};
+//        args = new String[]{"PiInt"};
+//        args = new String[]{"PiMC"};
+//        args = new String[]{"Barrier"};
+//        args = new String[]{"Broadcast"};
+//        args = new String[]{"PingPong"};
+//        args = new String[]{"RayTracerA"};
+//        args = new String[]{"RayTracerB"};
+//        args = new String[]{"RayTracerC"};
+//        args = new String[]{"RayTracerD"};
+//        args = new String[]{"MolDynA"};
+//        args = new String[]{"MolDynB"};
+//        args = new String[]{"MolDynC"};
+//        args = new String[]{"MolDynD"};
+//        args = new String[]{"MolDynE"};
 
         if (args.length == 0) {
             System.out.println("<start point> [nodes file] [num nodes]");
