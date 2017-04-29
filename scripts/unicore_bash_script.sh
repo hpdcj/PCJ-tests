@@ -96,49 +96,32 @@ while [ $nodes -gt 0 ]; do
 
 
         for benchmark in "${BENCHMARK_NAMES[@]}"; do
+            if [ $benchmark = "PingPong" ] &&
+                    [ $nodes -ne 2 -o $threads -ne 1 ] &&
+                    [ $nodes -ne 1 -o $threads -ne 2 ]; then
+                continue;
+            fi
+
             for idx in "${!PCJ_bin_jars[@]}"; do
                 PCJ_bin_jar=${PCJ_bin_jars[$idx]}
                 PCJ_tests_jar=${PCJ_tests_jars[$idx]}
 
+                log "Starting $benchmark on $nodes nodes each $threads threads using ${PCJ_bin_jar} jar file"
+                filename="`echo ${PCJ_bin_jar}_${benchmark} | tr '[:upper:]' '[:lower:]'`.out"
                 if [ $benchmark = "PingPong" ]; then
-                    # ... pingpong ...
-                    if [ $nodes -eq 2 -a $threads -eq 1 ]; then
-                        log "PingPong on 2 nodes using ${PCJ_bin_jar} jar file"
-
-                        filename="`echo ${PCJ_bin_jar}_pingpong_2n1t | tr '[:upper:]' '[:lower:]'`.out"
-#                        srun -N 2 -n 2 -c 48 -w ./nodes.uniq bash -c "java \
-                        mpiexec --hostfile nodes.uniq bash -c "java \
-                                    -Xmx120g \
-                                    -cp ..:../${PCJ_bin_jar}:../${PCJ_tests_jar} \
-                                    org.pcj.tests.Main \
-                                    PingPong \
-                                    nodes.uniq" | tee -a $filename >(tee >&2)
-                    elif [ $nodes -eq 1  -a $threads -eq 2 ]; then
-                        log "PingPong on 1 node using ${PCJ_bin_jar} jar file"
-
-                        filename="`echo ${PCJ_bin_jar}_pingpong_1n2t | tr '[:upper:]' '[:lower:]'`.out"
-#                        srun -N 1 -n 1 -c 48 -w ./nodes.uniq bash -c "java \
-                        mpiexec --hostfile nodes.uniq bash -c "java \
-                                    -Xmx120g \
-                                    -cp ..:../${PCJ_bin_jar}:../${PCJ_tests_jar} \
-                                    org.pcj.tests.Main \
-                                    PingPong \
-                                    nodes.txt" | tee -a $filename >(tee >&2)
-                    fi
-                else
-                    log "Starting $benchmark on $nodes nodes each $threads threads using ${PCJ_bin_jar} jar file"
-                    filename="`echo ${PCJ_bin_jar}_$benchmark | tr '[:upper:]' '[:lower:]'`.out"
-                    echo -e "$benchmark using:\t$nodes nodes\t$threads threads" >> $filename
-
-#                    srun -N $nodes -n $nodes -c 48 -w ./nodes.uniq bash -c "java \
-                    mpiexec --hostfile nodes.uniq bash -c "java \
-                            -Xmx120g \
-                            -cp ..:../${PCJ_bin_jar}:../${PCJ_tests_jar} \
-                            -Dpcj.chunksize=8192 \
-                            org.pcj.tests.Main \
-                            $benchmark \
-                            nodes.txt" | tee -a $filename >(tee >&2)
+                    filename="`echo ${PCJ_bin_jar}_${benchmark}_${nodes}n_${threads}t | tr '[:upper:]' '[:lower:]'`.out"
                 fi
+
+                echo -e "$benchmark using:\t$nodes nodes\t$threads threads" >> $filename
+
+#                srun -N $nodes -n $nodes -c 48 -w ./nodes.uniq bash -c "java \
+                mpiexec --hostfile nodes.uniq bash -c "java \
+                        -Xmx120g \
+                        -cp ..:../${PCJ_bin_jar}:../${PCJ_tests_jar} \
+                        -Dpcj.chunksize=8192 \
+                        org.pcj.tests.Main \
+                        $benchmark \
+                        nodes.txt" | tee -a $filename >(tee >&2)
             done
         done
     done
