@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
             }
         }
         if (rank == 0) {
-                System.out.format("pingpong\t%5d\tsize %12.7f\tt_isend_irecv %12.7f\n",
+                printf("pingpong\t%5d\tsize %12.7f\tt_isend_irecv %12.7f\n",
                         nproc, (double) n * sizeof(double) / 1024, tmin);
         }
         free(buf);
