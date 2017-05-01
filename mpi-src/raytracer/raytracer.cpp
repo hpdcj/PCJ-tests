@@ -15,14 +15,12 @@ using namespace std;
 #include "ray.hpp"
 #include "surface.hpp"
 #include "vec.hpp"
-#include "timer.hpp"
 
 Vec* trace (int level, double weight, Ray* r);
 int nprocess;
 int rank;
 MPI_Status status;
 int nLights, nObjects;
-TTimer tinit,trun,ttotal;
 
 Scene* scene;
 /**
@@ -443,12 +441,6 @@ Vec* trace (int level, double weight, Ray *r) {
 
 
 void JGFinitialise() {
-
-	if(rank==0) {
-		tinit.start();
-		//        JGFInstrumentor.startTimer("Section3:RayTracer:Init"); 
-	}
-
 	// set image size 
 	width = height = datasizes[size]; 
 
@@ -459,32 +451,15 @@ void JGFinitialise() {
 	setScene(scene); 
 
 	numobjects = scene->getObjects();
-
-	if(rank==0) {
-		tinit.stop();
-		//        JGFInstrumentor.stopTimer("Section3:RayTracer:Init"); 
-	}
-
 }
 
 void JGFapplication() { 
-
-	if(rank==0){
-		trun.start();
-		//JGFInstrumentor.startTimer("Section3:RayTracer:Run");  
-	}
-
 	// Set interval to be rendered to the whole picture 
 	// (overkill, but will be useful to retain this for parallel versions)
 	Interval* interval = new Interval(0,width,height,0,height,1); 
 
 	// Do the business!
 	render(interval); 
-
-	if(rank==0) {
-		trun.stop();
-		//JGFInstrumentor.stopTimer("Section3:RayTracer:Run");  
-	}
 
 } 
 
@@ -501,44 +476,23 @@ void JGFvalidate(){
 
 
 void JGFrun(int _size) {
-
-	if(rank==0) {
-		//        JGFInstrumentor.addTimer("Section3:RayTracer:Total", "Solutions",size);
-		//        JGFInstrumentor.addTimer("Section3:RayTracer:Init", "Objects",size);
-		//        JGFInstrumentor.addTimer("Section3:RayTracer:Run", "Pixels",size);
-	}
-
 	size = _size;
 
-	if(rank==0){
-		ttotal.start();
-		//        JGFInstrumentor.startTimer("Section3:RayTracer:Total");
-	}
-
 	JGFinitialise(); 
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    double time = MPI_Wtime();
+
 	JGFapplication(); 
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    time = MPI_Wtime() - time;
 
 	if(rank==0){
 		JGFvalidate(); 
-	}
 
-	if(rank==0) {
-		ttotal.stop();
-		//JGFInstrumentor.stopTimer("Section3:RayTracer:Total");
-
-		tinit.addops((double)numobjects);
-		trun.addops((double)(width*height));
-		ttotal.addops(1);
-		//JGFInstrumentor.addOpsToTimer("Section3:RayTracer:Init", (double) numobjects);
-		//JGFInstrumentor.addOpsToTimer("Section3:RayTracer:Run", (double) (width*height));
-		//JGFInstrumentor.addOpsToTimer("Section3:RayTracer:Total", 1);
-
-		//JGFInstrumentor.printTimer("Section3:RayTracer:Init"); 
-		//JGFInstrumentor.printTimer("Section3:RayTracer:Run"); 
-		//JGFInstrumentor.printTimer("Section3:RayTracer:Total"); 
-		printf("Section3:RayTracer:Init:Size%c\t%f (s) \t %f \t (ops/s)\n",size+'A',tinit.time,tinit.perf());
-		printf("Section3:RayTracer:Run:Size%c\t%f (s) \t %f \t (ops/s)\n",size+'A',trun.time,trun.perf());
-		printf("Section3:RayTracer:Total:Size%c\t%f (s) \t %f \t (ops/s)\n",size+'A',ttotal.time,ttotal.perf());
+        printf("raytracer[%d]\t%5d\ttime %12.7f\n",
+                    datasizes[size], nprocess, time);
 	}
 }
 

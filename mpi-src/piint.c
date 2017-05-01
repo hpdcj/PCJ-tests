@@ -93,7 +93,12 @@ main(int argc, char **argv)
 
     if (mynum == 0) {
         double err = pi - PI25DT;
-        printf("PiInt \t%d\t%f\tpi=%12.7lf,err=%10e\n", nprocs, tmin, pi, err);
+        if (err > 1e-5) {
+            fprintf(stderr, "Validation failed");
+            fprintf(stderr, "Value = %.15f, Error= %10e", pi, err);
+        }
+        printf("piint \t%d\ttime %12.7f\n",
+                nprocs, tmin);
     }
 
     MPI_Finalize();

@@ -3,9 +3,7 @@
 #include <cmath>
 #include <mpi.h>
 using namespace std;
-#include "timer.hpp"
 
-TTimer trun,ttotal;
 MPI_Status status;
 int nprocess;
 int rank;
@@ -25,65 +23,39 @@ void JGFinitialise(){
 }
 
 void JGFapplication() { 
-
-	MPI_Barrier(MPI_COMM_WORLD);
-	if(rank==0) {
-		trun.start();
-		//      JGFInstrumentor.startTimer("Section3:MolDyn:Run");  
-	}
-
 	runiters();
-
-	MPI_Barrier(MPI_COMM_WORLD);
-	if(rank==0) {
-		trun.stop();
-		//      JGFInstrumentor.stopTimer("Section3:MolDyn:Run");  
-	}
 } 
 
 
 void JGFvalidate(){
 	double refval[] = {1731.4306625334357,7397.392307839352,
-    13774.625810229074, 46548.77475182352, 110502.46709547556,
-    0,0,0};
+    13774.625810229074, 46548.77475182352, 372757.1114270106};
 	double dev = fabs(ek - refval[size]);
-	if (dev > 1.0e-10 ){
+	if (dev > 1.0e-8 ){
 		printf("Validation failed\n");
 		printf("Kinetic Energy = %g %g %d\n", ek, dev, size);
 	}
 }
 
 void JGFrun(int size) {
-
-	if(rank==0) {
-		//      JGFInstrumentor.addTimer("Section3:MolDyn:Total", "Solutions",size);
-		//      JGFInstrumentor.addTimer("Section3:MolDyn:Run", "Interactions",size);
-	}
-
 	JGFsetsize(size); 
 
-	if(rank==0) {
-		ttotal.start();
-		//      JGFInstrumentor.startTimer("Section3:MolDyn:Total");
-	}
+    JGFinitialise(); 
 
-	JGFinitialise(); 
-	JGFapplication(); 
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    double time = MPI_Wtime();
+    JGFapplication();
+    MPI_Barrier(MPI_COMM_WORLD);
+
     if (rank==0) {
-	   JGFvalidate(); 
-    }
+        time = MPI_Wtime() - time;
 
-	if(rank==0) {
-		ttotal.stop();
-		//      JGFInstrumentor.stopTimer("Section3:MolDyn:Total");
+        JGFvalidate();
 
-		trun.addops((double) interactions);
-		ttotal.addops(1);
-
-		printf("Section3:MolDyn:Run:Size%c\t%f (s) \t %f \t (ops/s)\n",size+'A',trun.time,trun.perf());
-		printf("Section3:MolDyn:Total:Size%c\t%f (s) \t %f \t (ops/s)\n",size+'A',ttotal.time,ttotal.perf());
+        printf("moldyn[%d]\t%5d\ttime %12.7f\n",
+                datasizes[size], nprocess, time);
 	}
-
 }
 
 int main(int argc, char *argv[]) {
@@ -101,9 +73,6 @@ int main(int argc, char *argv[]) {
 		if (argv[1][0]=='C') size=2;
 		if (argv[1][0]=='D') size=3;
 		if (argv[1][0]=='E') size=4;
-		if (argv[1][0]=='F') size=5;
-		if (argv[1][0]=='G') size=6;
-		if (argv[1][0]=='H') size=7;
 	}
 
 	JGFrun(size);
