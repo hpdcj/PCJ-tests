@@ -463,8 +463,8 @@ public class RayTracerBench {
         // set image size
         width = height = datasizes[size];
         if (PCJ.myId() == 0) {
-            PCJ.putLocal(Shared.r_checksum, new long[PCJ.threadCount()]);
-            PCJ.putLocal(Shared.r_p_row, new int[PCJ.threadCount()][0]);
+            PCJ.putLocal(new long[PCJ.threadCount()], Shared.r_checksum);
+            PCJ.putLocal(new int[PCJ.threadCount()][0], Shared.r_p_row);
 
             PCJ.monitor(Shared.r_checksum);
             PCJ.monitor(Shared.r_p_row);

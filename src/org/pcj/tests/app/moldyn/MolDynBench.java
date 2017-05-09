@@ -338,12 +338,12 @@ public class MolDynBench {
 
     public void JGFinitialise() {
         if (PCJ.myId() == 0) {
-            PCJ.putLocal(Reduce.r_xforce, new double[PCJ.threadCount()][0]);
-            PCJ.putLocal(Reduce.r_yforce, new double[PCJ.threadCount()][0]);
-            PCJ.putLocal(Reduce.r_zforce, new double[PCJ.threadCount()][0]);
-            PCJ.putLocal(Reduce.r_epot, new double[PCJ.threadCount()]);
-            PCJ.putLocal(Reduce.r_vir, new double[PCJ.threadCount()]);
-            PCJ.putLocal(Reduce.r_interactions, new long[PCJ.threadCount()]);
+            PCJ.putLocal(new double[PCJ.threadCount()][0], Reduce.r_xforce);
+            PCJ.putLocal(new double[PCJ.threadCount()][0], Reduce.r_yforce);
+            PCJ.putLocal(new double[PCJ.threadCount()][0], Reduce.r_zforce);
+            PCJ.putLocal(new double[PCJ.threadCount()], Reduce.r_epot);
+            PCJ.putLocal(new double[PCJ.threadCount()], Reduce.r_vir);
+            PCJ.putLocal(new long[PCJ.threadCount()], Reduce.r_interactions);
 
             PCJ.monitor(Reduce.r_xforce);
             PCJ.monitor(Reduce.r_yforce);

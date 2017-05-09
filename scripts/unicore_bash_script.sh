@@ -10,18 +10,23 @@
 timer=`date +%s`
 
 function log {
-  output=$(echo "";echo "`date +'%y-%m-%d %H:%M:%S'`" ; while read -r line; do echo -e "\t$line"; done < <(echo -e "$@");echo "")
+  local output=$(echo "";echo "`date +'%y-%m-%d %H:%M:%S'`" ; while IFS= read -r line; do echo -e "\t$line"; done < <(echo -e "$@");echo "")
   echo "$output"
   echo "$output" 1>&2
 }
 
-log "Current date: `date`"
-log "Master host: `/bin/hostname`"
-log "Working directory: `pwd`"
-log "Environment variables: `env`"
-log "Set variables: `set`"
-log "CPU info: `cat /proc/cpuinfo`"
-log "MEM info: `cat /proc/meminfo`"
+function esc {
+    echo "$@" | sed 's#\\#\\\\\\\\#g'
+}
+
+log "Current date: $(esc "`date`")"
+log "Master host: $(esc "`/bin/hostname`")"
+log "Working directory: $(esc "`pwd`")"
+log "Current script: $0\n$(esc "`cat -n $0`")"
+log "Environment variables: $(esc "`env`")"
+log "Set variables: $(esc "`set`"))"
+log "CPU info: $(esc "`cat /proc/cpuinfo`")"
+log "MEM info: $(esc "`cat /proc/meminfo`")"
 
 
 # --- LOADING MODULES ---
@@ -31,7 +36,7 @@ module load plgrid/tools/java8 || exit 1
 
 
 # --- SHOW VERSIONS ---
-log "Tools:\n * `mpicc --showme:version 2>&1`\n * `mpicc --version 2>&1`\n * `java -version 2>&1`"
+log "Tools:\n * $(esc "`mpicc --showme:version 2>&1`")\n * $(esc "`mpicc --version 2>&1`")\n * $(esc "`java -version 2>&1`")"
 
 
 # --- PREPARING NODES LIST ---
