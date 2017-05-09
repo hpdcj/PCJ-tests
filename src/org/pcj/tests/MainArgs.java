@@ -31,8 +31,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 import org.pcj.StartPoint;
 
 /**
@@ -46,14 +44,10 @@ public class MainArgs {
 
     private String[] readNodes(InputStream is) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        List<String> _nodes = new ArrayList<>();
-        String node;
-        while ((node = br.readLine()) != null) {
-            if (node.trim().isEmpty() == false) {
-                _nodes.add(node);
-            }
-        }
-        return _nodes.toArray(new String[0]);
+        return br.lines()
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toArray(String[]::new);
     }
 
     private void getPcjClasses(String param) {
@@ -99,6 +93,9 @@ public class MainArgs {
                 break;
             case "MolDynE":
                 startPoint = org.pcj.tests.app.moldyn.MolDynE.class; // StartPoint
+                break;
+            case "PingPongRev":
+                startPoint = org.pcj.tests.micro.PingPongRev.class;
                 break;
             case "EasyTest":
             default:
