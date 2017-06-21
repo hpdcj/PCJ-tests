@@ -31,11 +31,11 @@ package org.pcj.tests.micro;
 import org.pcj.PCJ;
 import org.pcj.StartPoint;
 import org.pcj.Storage;
-import org.pcj.tests.micro.Broadcast.SharedEnum;
+import org.pcj.tests.micro.BroadcastRev.SharedEnum;
 import org.pcj.RegisterStorage;
 
 @RegisterStorage(SharedEnum.class)
-public class Broadcast implements StartPoint {
+public class BroadcastRev implements StartPoint {
 
     @Storage(Broadcast.class)
     public enum SharedEnum {
@@ -55,7 +55,8 @@ public class Broadcast implements StartPoint {
         final int ntimes = 100;
         final int number_of_tests = 5;
 
-        for (int n : transmit) {
+        for (int j = transmit.length - 1; j >= 0; j--) {
+            int n = transmit[j];
             PCJ.barrier();
 
             double[] b = new double[n];

@@ -53,19 +53,19 @@ public class MainArgs {
     private void getPcjClasses(String param) {
         switch (param) {
             case "PingPong":
-                startPoint = org.pcj.tests.micro.PingPong.class; // StartPoint
+                startPoint = org.pcj.tests.micro.PingPong.class; 
                 break;
             case "Barrier":
-                startPoint = org.pcj.tests.micro.Barrier.class; // StartPoint
+                startPoint = org.pcj.tests.micro.Barrier.class; 
                 break;
             case "Broadcast":
-                startPoint = org.pcj.tests.micro.Broadcast.class; // StartPoint
+                startPoint = org.pcj.tests.micro.Broadcast.class; 
                 break;
             case "PiInt":
-                startPoint = org.pcj.tests.app.PiInt.class; // StartPoint
+                startPoint = org.pcj.tests.app.PiInt.class; 
                 break;
             case "PiMC":
-                startPoint = org.pcj.tests.app.PiMC.class; // StartPoint
+                startPoint = org.pcj.tests.app.PiMC.class; 
                 break;
             case "RayTracerA":
                 startPoint = org.pcj.tests.app.raytracer.RayTracerA.class;
@@ -80,22 +80,25 @@ public class MainArgs {
                 startPoint = org.pcj.tests.app.raytracer.RayTracerD.class;
                 break;
             case "MolDynA":
-                startPoint = org.pcj.tests.app.moldyn.MolDynA.class; // StartPoint
+                startPoint = org.pcj.tests.app.moldyn.MolDynA.class; 
                 break;
             case "MolDynB":
-                startPoint = org.pcj.tests.app.moldyn.MolDynB.class; // StartPoint
+                startPoint = org.pcj.tests.app.moldyn.MolDynB.class; 
                 break;
             case "MolDynC":
-                startPoint = org.pcj.tests.app.moldyn.MolDynC.class; // StartPoint
+                startPoint = org.pcj.tests.app.moldyn.MolDynC.class; 
                 break;
             case "MolDynD":
-                startPoint = org.pcj.tests.app.moldyn.MolDynD.class; // StartPoint
+                startPoint = org.pcj.tests.app.moldyn.MolDynD.class; 
                 break;
             case "MolDynE":
-                startPoint = org.pcj.tests.app.moldyn.MolDynE.class; // StartPoint
+                startPoint = org.pcj.tests.app.moldyn.MolDynE.class; 
                 break;
             case "PingPongRev":
                 startPoint = org.pcj.tests.micro.PingPongRev.class;
+                break;
+            case "BroadcastRev":
+                startPoint = org.pcj.tests.micro.BroadcastRev.class;
                 break;
             case "EasyTest":
             default:
