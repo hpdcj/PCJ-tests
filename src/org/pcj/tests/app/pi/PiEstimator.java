@@ -23,41 +23,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.pcj.tests.app.mr;
+package org.pcj.tests.app.pi;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.pcj.PCJ;
+import org.pcj.RegisterStorage;
+import org.pcj.StartPoint;
+import org.pcj.Storage;
 
-public class PiEstimatorJava implements Runnable {
-
-    private final static long NUM_POINTS = 1_000_000_000;
-    private final static int THREAD_COUNT = 4;
-
-    private static CountDownLatch latch;
-
-    private final int id;
-    private final long offset;
-    private final long numPoints;
-    private long numInside;
-
-    public long getNumInside() {
-        return numInside;
-    }
-
-    public PiEstimatorJava(int id, long offset, long numPoints) {
-        this.id = id;
-        this.offset = offset;
-        this.numPoints = numPoints;
-    }
+@RegisterStorage(PiEstimator.Shared.class)
+public class PiEstimator implements StartPoint {
 
     /**
      * Part of CloudEra Hadoop examples.
@@ -69,7 +46,7 @@ public class PiEstimatorJava implements Runnable {
      * and i >= 1 is the index. Halton sequence is used to generate sample
      * points for Pi estimation.
      */
-    public static class HaltonSequence {
+    private static class HaltonSequence {
 
         /**
          * Bases
@@ -89,7 +66,7 @@ public class PiEstimatorJava implements Runnable {
          * Initialize to H(startindex), so the sequence begins with
          * H(startindex+1).
          */
-        public HaltonSequence(long startindex) {
+        HaltonSequence(long startindex) {
             index = startindex;
             x = new double[K.length];
             q = new double[K.length][];
@@ -118,7 +95,7 @@ public class PiEstimatorJava implements Runnable {
          *
          * @return a 2-dimensional point with coordinates in [0,1)^2
          */
-        public double[] nextPoint() {
+        double[] nextPoint() {
             index++;
             for (int i = 0; i < K.length; i++) {
                 for (int j = 0; j < K[i]; j++) {
@@ -135,13 +112,22 @@ public class PiEstimatorJava implements Runnable {
         }
     }
 
+    final private long[] numInsideArray = PCJ.myId() == 0 ? new long[PCJ.threadCount()] : null;
+//    final private long[] numOutsideArray = PCJ.myId() == 0 ? new long[PCJ.threadCount()] : null;
+
+    @Storage(PiEstimator.class)
+    enum Shared {
+        numInsideArray,
+//        numOutsideArray,
+    }
+
     private void calc(long offset, long size) {
         final HaltonSequence haltonsequence = new HaltonSequence(offset);
-        numInside = 0L;
+        long numInside = 0L;
+//        long numOutside = 0L;
 
         for (long i = 0; i < size; ++i) {
             //generate points in a unit square
-
             final double[] point = haltonsequence.nextPoint();
 
             //count points inside/outside of the inscribed circle of the square
@@ -149,79 +135,68 @@ public class PiEstimatorJava implements Runnable {
             final double y = point[1] - 0.5;
             if (x * x + y * y <= 0.25) {
                 numInside++;
+//            } else {
+//                numOutside++;
             }
         }
+
+        PCJ.asyncPut(numInside, 0, Shared.numInsideArray, PCJ.myId());
+//        PCJ.put(numOutside, 0, Shared.numOutsideArray, PCJ.myId());
     }
 
     private final long[] time = new long[5];
 
-    @Override
-    public void run() {
-        try {
-            latch.countDown();
-            latch.await();
-            System.err.println("Starting thread " + id);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(PiEstimatorJava.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        time[0] = System.nanoTime();
+    public BigDecimal estimate(int numMaps, long numPoints) throws IOException {
+        long offset = PCJ.myId() * numPoints;
         calc(offset, numPoints);
+
         time[1] = System.nanoTime();
 
-        System.err.println("Thread " + id + ": " + (time[1] - time[0]) / 1e9 + "s");
+        if (PCJ.myId() == 0) {
+            long numInside = 0L;
+//            long numOutside = 0L;
+
+            PCJ.waitFor(Shared.numInsideArray, PCJ.threadCount());
+//            PCJ.waitFor(Shared.numOutsideArray, PCJ.threadCount());
+
+            time[2] = System.nanoTime();
+
+            for (long num : numInsideArray) {
+                numInside += num;
+            }
+//            for (long num : numOutsideArray) {
+//                numOutside += num;
+//            }
+
+            time[3] = System.nanoTime();
+
+            return BigDecimal.valueOf(4).setScale(20)
+                    .multiply(BigDecimal.valueOf(numInside))
+                    .divide(BigDecimal.valueOf(numMaps), RoundingMode.HALF_EVEN)
+                    .divide(BigDecimal.valueOf(numPoints), RoundingMode.HALF_EVEN);
+        } else {
+            return null;
+        }
     }
 
-    private static long runExecution(long numPoints, int threadCount) {
-        latch = new CountDownLatch(threadCount);
+    @Override
+    public void main() throws Throwable {
+        final int nMaps = PCJ.threadCount();
+        
+        estimate(nMaps, 1000); // warm-up
+        
+        final long nSamples = 100_000_000L;
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(threadCount);
+        time[0] = System.nanoTime();
+        BigDecimal pi = estimate(nMaps, nSamples);
+        time[4] = System.nanoTime();
 
-        PiEstimatorJava[] estimators = new PiEstimatorJava[threadCount];
-        for (int i = 0; i < threadCount; ++i) {
-            estimators[i] = new PiEstimatorJava(i, i * numPoints, numPoints);
+        if (PCJ.myId() == 0) {
+            System.out.printf("PiEstimator\t%5d\ttime %12.7f%n",
+                    PCJ.threadCount(),
+                    (time[4] - time[0]) / 1e9
+            );
         }
 
-        long time = System.nanoTime();
-        Arrays.stream(estimators).forEach(threadPool::execute);
-        threadPool.shutdown();
-        try {
-            threadPool.awaitTermination(Integer.MAX_VALUE, TimeUnit.DAYS);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(PiEstimatorJava.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        long numInside = Arrays.stream(estimators).mapToLong(PiEstimatorJava::getNumInside).sum();
-        time = System.nanoTime() - time;
-
-        BigDecimal pi = BigDecimal.valueOf(4).setScale(20)
-                .multiply(BigDecimal.valueOf(numInside))
-                .divide(BigDecimal.valueOf(threadCount), RoundingMode.HALF_EVEN)
-                .divide(BigDecimal.valueOf(numPoints), RoundingMode.HALF_EVEN);
-        System.out.println("Pi = " + pi + " using " + numPoints + " points per thread and " + threadCount + " threads ");
-
-        return time;
-    }
-// run.jvmargs=-XX:+UnlockDiagnosticVMOptions -XX:+PrintInlining -XX:+PrintGC -XX:+PrintCompilation
-
-    public static void main(String[] args) {
-//        runExecution(1000_000_000, 1);
-//        System.err.println("---");
-
-        List<Long> times = new ArrayList<>();
-        int nTimes = 3;
-        for (int i = 1; i <= nTimes; ++i) {
-            System.err.println("Starting execution: " + i + " of " + nTimes);
-            long time = runExecution(NUM_POINTS, THREAD_COUNT);
-            times.add(time);
-            System.err.println("Time taken: " + time / 1e9 + "s");
-            System.err.println("-------------------------");
-
-        }
-        System.out.println("Min time: " + (times.stream().mapToLong(Long::longValue).min().orElse(0)) / 1e9 + "s");
-        System.out.println("Avg time: " + (times.stream().mapToLong(Long::longValue).sum() / nTimes) / 1e9 + "s");
-        System.out.println("Max time: " + (times.stream().mapToLong(Long::longValue).max().orElse(0)) / 1e9 + "s");
-        System.out.println("Median: " + (times.stream().mapToLong(Long::longValue).sorted().skip((nTimes - 1) / 2).limit(nTimes % 2 == 0 ? 2 : 1).average().orElse(0)) / 1e9 + "s");
     }
 }
-// run.jvmargs=-Xcomp -Xbatch -XX:+PrintCompilation -XX:+UnlockDiagnosticVMOptions -XX\+PrintInlining

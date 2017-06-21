@@ -23,14 +23,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.pcj.tests.app;
+package org.pcj.tests.app.pi;
 
 import org.pcj.PCJ;
 import org.pcj.PcjFuture;
 import org.pcj.RegisterStorage;
 import org.pcj.StartPoint;
 import org.pcj.Storage;
-import org.pcj.tests.app.PiInt.Shared;
+import org.pcj.tests.app.pi.PiInt.Shared;
 
 /**
  *

@@ -62,10 +62,13 @@ public class MainArgs {
                 startPoint = org.pcj.tests.micro.Broadcast.class; 
                 break;
             case "PiInt":
-                startPoint = org.pcj.tests.app.PiInt.class; 
+                startPoint = org.pcj.tests.app.pi.PiInt.class; 
                 break;
             case "PiMC":
-                startPoint = org.pcj.tests.app.PiMC.class; 
+                startPoint = org.pcj.tests.app.pi.PiMC.class; 
+                break;
+            case "PiEstimator":
+                startPoint = org.pcj.tests.app.pi.PiEstimator.class; 
                 break;
             case "RayTracerA":
                 startPoint = org.pcj.tests.app.raytracer.RayTracerA.class;
