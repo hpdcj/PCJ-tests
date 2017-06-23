@@ -39,8 +39,8 @@ import org.pcj.StartPoint;
  */
 public class MainArgs {
 
-    private Class<? extends StartPoint> startPoint;
-    private String[] nodes;
+    private final Class<? extends StartPoint> startPoint;
+    private final String[] nodes;
 
     private String[] readNodes(InputStream is) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -50,85 +50,76 @@ public class MainArgs {
                 .toArray(String[]::new);
     }
 
-    private void getPcjClasses(String param) {
+    private Class<? extends StartPoint> getPcjClasses(String param) {
         switch (param) {
+            case "HelloWorld":
+                return org.pcj.tests.HelloWorld.class;
             case "PingPong":
-                startPoint = org.pcj.tests.micro.PingPong.class; 
-                break;
+                return org.pcj.tests.micro.PingPong.class;
             case "Barrier":
-                startPoint = org.pcj.tests.micro.Barrier.class; 
-                break;
+                return org.pcj.tests.micro.Barrier.class;
             case "Broadcast":
-                startPoint = org.pcj.tests.micro.Broadcast.class; 
-                break;
+                return org.pcj.tests.micro.Broadcast.class;
             case "PiInt":
-                startPoint = org.pcj.tests.app.pi.PiInt.class; 
-                break;
+                return org.pcj.tests.app.pi.PiInt.class;
             case "PiMC":
-                startPoint = org.pcj.tests.app.pi.PiMC.class; 
-                break;
+                return org.pcj.tests.app.pi.PiMC.class;
             case "PiEstimator":
-                startPoint = org.pcj.tests.app.pi.PiEstimator.class; 
-                break;
+                return org.pcj.tests.app.pi.PiEstimator.class;
             case "RayTracerA":
-                startPoint = org.pcj.tests.app.raytracer.RayTracerA.class;
-                break;
+                return org.pcj.tests.app.raytracer.RayTracerA.class;
             case "RayTracerB":
-                startPoint = org.pcj.tests.app.raytracer.RayTracerB.class;
-                break;
+                return org.pcj.tests.app.raytracer.RayTracerB.class;
             case "RayTracerC":
-                startPoint = org.pcj.tests.app.raytracer.RayTracerC.class;
-                break;
+                return org.pcj.tests.app.raytracer.RayTracerC.class;
             case "RayTracerD":
-                startPoint = org.pcj.tests.app.raytracer.RayTracerD.class;
-                break;
+                return org.pcj.tests.app.raytracer.RayTracerD.class;
             case "MolDynA":
-                startPoint = org.pcj.tests.app.moldyn.MolDynA.class; 
-                break;
+                return org.pcj.tests.app.moldyn.MolDynA.class;
             case "MolDynB":
-                startPoint = org.pcj.tests.app.moldyn.MolDynB.class; 
-                break;
+                return org.pcj.tests.app.moldyn.MolDynB.class;
             case "MolDynC":
-                startPoint = org.pcj.tests.app.moldyn.MolDynC.class; 
-                break;
+                return org.pcj.tests.app.moldyn.MolDynC.class;
             case "MolDynD":
-                startPoint = org.pcj.tests.app.moldyn.MolDynD.class; 
-                break;
+                return org.pcj.tests.app.moldyn.MolDynD.class;
             case "MolDynE":
-                startPoint = org.pcj.tests.app.moldyn.MolDynE.class; 
-                break;
+                return org.pcj.tests.app.moldyn.MolDynE.class;
             case "PingPongRev":
-                startPoint = org.pcj.tests.micro.PingPongRev.class;
-                break;
+                return org.pcj.tests.micro.PingPongRev.class;
             case "BroadcastRev":
-                startPoint = org.pcj.tests.micro.BroadcastRev.class;
-                break;
+                return org.pcj.tests.micro.BroadcastRev.class;
             case "EasyTest":
+                return org.pcj.tests.EasyTest.class;
             default:
-                startPoint = org.pcj.tests.EasyTest.class;
-                break;
+                return org.pcj.tests.HelloWorld.class;
         }
     }
 
     public MainArgs(String[] args) throws FileNotFoundException, IOException {
+        String[] _nodes = null;
         if (args.length >= 2 && args[1].isEmpty() == false) {
             try (FileInputStream fis = new FileInputStream(args[1])) {
-                nodes = readNodes(fis);
+                _nodes = readNodes(fis);
+            } catch (IOException ex) {
+                System.err.println("Unable to load nodes file: " + args[1]);
             }
-        } else {
+        }
+
+        if (_nodes == null) {
             try (InputStream is = MainArgs.class.getResourceAsStream("nodes.txt")) {
-                nodes = readNodes(is);
+                _nodes = readNodes(is);
             }
         }
 
         if (args.length >= 3) {
             int NPROC = Integer.parseInt(args[2]);
-            String[] _nodes = new String[NPROC];
-            System.arraycopy(nodes, 0, _nodes, 0, NPROC);
+            nodes = new String[NPROC];
+            System.arraycopy(_nodes, 0, nodes, 0, NPROC);
+        } else {
             nodes = _nodes;
         }
 
-        getPcjClasses(args[0]);
+        startPoint = getPcjClasses(args[0]);
     }
 
     /**
