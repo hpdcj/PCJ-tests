@@ -37,7 +37,7 @@ import org.pcj.RegisterStorage;
 @RegisterStorage(SharedEnum.class)
 public class BroadcastRev implements StartPoint {
 
-    @Storage(Broadcast.class)
+    @Storage(BroadcastRev.class)
     public enum SharedEnum {
         a
     }
@@ -47,26 +47,29 @@ public class BroadcastRev implements StartPoint {
     public void main() {
         int[] transmit
                 = {
-                    1, 10, 100, 1024, 2048, 4096, 8192, 16384,
-                    32768, 65536, 131072, 262144, 524288, 1048576, 2097152,
-                    4194304, //8388608, //16777216,
+                    1, // 8 B
+                    2048, // 32 KB
+                    4194304, // 32 MB
+                //                    1, 10, 100, 1024, 2048, 4096, 8192, 16384,
+                //                    32768, 65536, 131072, 262144, 524288, 1048576, 2097152,
+                //                    4194304, //8388608, //16777216,
                 };
 
-        final int ntimes = 100;
+        final int ntimes = 10;
         final int number_of_tests = 5;
 
         for (int j = transmit.length - 1; j >= 0; j--) {
             int n = transmit[j];
-            PCJ.barrier();
 
             double[] b = new double[n];
             for (int i = 0; i < n; i++) {
                 b[i] = (double) i + 1;
             }
             PCJ.monitor(SharedEnum.a);
-
             PCJ.barrier();
+
             double tmin = Double.MAX_VALUE;
+
             for (int k = 0; k < number_of_tests; k++) {
                 long time = System.nanoTime();
 
@@ -78,10 +81,13 @@ public class BroadcastRev implements StartPoint {
 
                 time = System.nanoTime() - time;
                 double dtime = (time / (double) ntimes) * 1e-9;
-
                 PCJ.barrier();
                 if (tmin > dtime) {
                     tmin = dtime;
+                }
+                if (PCJ.myId()==0) {
+                    System.err.format("   %5d\tsize %12.7f\ttime %12.7f%n",
+                        PCJ.threadCount(), (double) n * 8 / 1024, dtime);
                 }
             }
 
