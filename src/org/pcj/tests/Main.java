@@ -36,23 +36,25 @@ import org.pcj.PCJ;
 public class Main {
 
     public static void main(String[] args) throws Throwable {
-        if (args.length == 0) {
-            System.out.println("<start point> [nodes file] [num nodes]");
-            System.exit(1);
-        }
+        try (DumpInfo dumpInfo = new DumpInfo()) {
+            if (args.length == 0) {
+                System.out.println("<start point> [nodes file] [num nodes]");
+                System.exit(1);
+            }
 
-        MainArgs mainArgs = new MainArgs(args);
+            MainArgs mainArgs = new MainArgs(args);
 
-        if (mainArgs.getStartPoint() == null) {
-            System.err.println("Unknown task: " + args[0]);
-            System.exit(2);
-        }
+            if (mainArgs.getStartPoint() == null) {
+                System.err.println("Unknown task: " + args[0]);
+                System.exit(2);
+            }
 
-        try {
-            PCJ.start(mainArgs.getStartPoint(), new NodesDescription(mainArgs.getNodes()));
-        } catch (NullPointerException ex) {
-            System.err.println("Used nodes: " + Arrays.toString(mainArgs.getNodes()));
-            throw ex;
+            try {
+                PCJ.start(mainArgs.getStartPoint(), new NodesDescription(mainArgs.getNodes()));
+            } catch (NullPointerException ex) {
+                System.err.println("Used nodes: " + Arrays.toString(mainArgs.getNodes()));
+                throw ex;
+            }
         }
     }
 }
