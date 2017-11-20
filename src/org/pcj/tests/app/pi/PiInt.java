@@ -51,26 +51,31 @@ public class PiInt implements StartPoint {
 
     @Override
     public void main() throws Throwable {
-        int ntimes = 100;
-        int points = 100_000_000;
+        int number_of_tests = 10;
+        int points = 1_000_000_000;
 
         double pi = 0.0;
 
-        long time = System.nanoTime();
-
-        for (int i = 0; i < ntimes; ++i) {
-            pi = calc(points);
+        double t_min = Double.MAX_VALUE;
+        for (int i = 0; i < number_of_tests; ++i) {
             PCJ.barrier();
-        }
+            long time = System.nanoTime();
 
-        time = System.nanoTime() - time;
-        double dtime = time * 1e-9;
+            pi = calc(points);
+
+            time = System.nanoTime() - time;
+            double dtime = time / 1e9;
+
+            if (dtime < t_min) {
+                t_min = dtime;
+            }
+        }
 
         if (PCJ.myId() == 0) {
             validate(pi);
 
             System.out.format("PiInt\t%5d\ttime %12.7f%n",
-                    PCJ.threadCount(), dtime);
+                    PCJ.threadCount(), t_min);
         }
     }
 
