@@ -34,6 +34,7 @@ import org.pcj.PCJ;
 public class MainWithDeploy {
 
     public static void main(String[] args) throws Throwable {
+        try (DumpInfo dumpInfo = new DumpInfo()) {
 //        args = new String[]{"EasyTest"};
 //        args = new String[]{"PiInt"};
 //        args = new String[]{"PiMC"};
@@ -50,19 +51,19 @@ public class MainWithDeploy {
 //        args = new String[]{"MolDynC"};
 //        args = new String[]{"MolDynD"};
 //        args = new String[]{"MolDynE"};
+            if (args.length == 0) {
+                System.out.println("<start point> [nodes file] [num nodes]");
+                System.exit(1);
+            }
 
-        if (args.length == 0) {
-            System.out.println("<start point> [nodes file] [num nodes]");
-            System.exit(1);
+            MainArgs mainArgs = new MainArgs(args);
+
+            if (mainArgs.getStartPoint() == null) {
+                System.err.println("Unknown task: " + args[0]);
+                System.exit(2);
+            }
+
+            PCJ.deploy(mainArgs.getStartPoint(), new NodesDescription(mainArgs.getNodes()));
         }
-
-        MainArgs mainArgs = new MainArgs(args);
-
-        if (mainArgs.getStartPoint() == null) {
-            System.err.println("Unknown task: " + args[0]);
-            System.exit(2);
-        }
-
-        PCJ.deploy(mainArgs.getStartPoint(), new NodesDescription(mainArgs.getNodes()));
     }
 }
