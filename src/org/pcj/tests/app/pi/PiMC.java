@@ -25,9 +25,11 @@
  */
 package org.pcj.tests.app.pi;
 
+import java.util.Arrays;
 import java.util.Random;
 import org.pcj.PCJ;
 import org.pcj.PcjFuture;
+import org.pcj.PcjRuntimeException;
 import org.pcj.StartPoint;
 import org.pcj.Storage;
 import org.pcj.tests.app.pi.PiMC.Shared;
@@ -35,6 +37,8 @@ import org.pcj.RegisterStorage;
 
 @RegisterStorage(Shared.class)
 public class PiMC implements StartPoint {
+
+    private final Random random = new Random();
 
     @Storage(PiMC.class)
     public enum Shared {
@@ -44,12 +48,42 @@ public class PiMC implements StartPoint {
 
     @Override
     public void main() {
-        Random random = new Random();
-        long nAll = 512_000_000;
-        long n = nAll / PCJ.threadCount();
+        long pointsAll = Long.parseLong(System.getProperty("PiMC.pointsAll", "600000000"));
+        long points = pointsAll / PCJ.threadCount();
+        if (PCJ.myId() == 0) {
+            System.err.println("PiMC on " + pointsAll + " points");
+        }
 
+        int number_of_tests = 5;
+        double[] times = new double[number_of_tests];
+
+        double pi = 0.0;
+
+        for (int i = 0; i < number_of_tests; ++i) {
+            PCJ.barrier();
+
+            long time = System.nanoTime();
+            pi = calculate(points);
+            double dtime = (System.nanoTime() - time) / 1e9;
+
+            times[i] = dtime;
+            if (PCJ.myId() == 0) {
+                System.err.printf("PiMC\t%5d\ttime %12.7f%n", PCJ.threadCount(), dtime);
+            }
+        }
+        // Print results         
+        if (PCJ.myId() == 0) {
+            validate(pi);
+
+            System.out.format("PiMC\t%5d\tpointsAll %d\ttime %12.7f\ttimes=%s%n",
+                    PCJ.threadCount(), pointsAll,
+                    Arrays.stream(times).min().getAsDouble(), Arrays.toString(times));
+        }
+
+    }
+
+    private double calculate(long n) throws PcjRuntimeException {
         circleCount = 0;
-        long time = System.nanoTime();
 
         // Calculate  
         for (long i = 0; i < n; ++i) {
@@ -59,35 +93,26 @@ public class PiMC implements StartPoint {
                 circleCount++;
             }
         }
-        
+
         PCJ.barrier();
 
         // Gather results 
-        long c = 0;
-        PcjFuture<Long> cL[] = new PcjFuture[PCJ.threadCount()];
-
         if (PCJ.myId() == 0) {
+            long c = 0;
+            PcjFuture<Long> cL[] = new PcjFuture[PCJ.threadCount()];
+
             for (int p = 0; p < PCJ.threadCount(); p++) {
                 cL[p] = PCJ.asyncGet(p, Shared.circleCount);
             }
             for (int p = 0; p < PCJ.threadCount(); p++) {
                 c = c + (long) cL[p].get();
             }
+
+            // Calculate pi 
+            return 4.0 * (double) c / ((double) n * PCJ.threadCount());
         }
 
-        // Calculate pi 
-        double pi = 4.0 * (double) c / (double) nAll;
-
-        time = System.nanoTime() - time;
-        double dtime = time * 1e-9;
-
-        // Print results         
-        if (PCJ.myId() == 0) {
-            validate(pi);
-
-            System.out.format("PiMC\t%5d\ttime %12.7f%n",
-                    PCJ.threadCount(), dtime);
-        }
+        return Double.NaN;
     }
 
     private void validate(double pi) {
