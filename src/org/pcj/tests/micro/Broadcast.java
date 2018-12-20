@@ -44,7 +44,7 @@ public class Broadcast implements StartPoint {
     double[] a;
 
     @Override
-    public void main() {
+    public void main() throws InterruptedException {
         int[] transmit
                 = {
                     1, 10, 100, 1024, 2048, 4096, 8192, 16384,
@@ -56,6 +56,8 @@ public class Broadcast implements StartPoint {
         final int number_of_tests = 5;
 
         for (int n : transmit) {
+            System.gc();
+            Thread.sleep(1000);
             PCJ.barrier();
 
             double[] b = new double[n];

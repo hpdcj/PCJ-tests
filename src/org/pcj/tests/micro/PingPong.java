@@ -45,7 +45,7 @@ public class PingPong implements StartPoint {
     double[] a;
 
     @Override
-    public void main() {
+    public void main() throws InterruptedException {
         if (PCJ.threadCount() < 2) {
             return;
         }
@@ -70,6 +70,9 @@ public class PingPong implements StartPoint {
         final int number_of_tests = 5;
 
         for (int j = 0; j < transmit.length; j++) {
+            System.gc();
+            Thread.sleep(1000);
+
             int n = transmit[j];
             if (g.myId() == 0) {
                 System.err.println("n=" + n);

@@ -44,7 +44,7 @@ public class PingPongRev implements StartPoint {
     volatile double[] a;
 
     @Override
-    public void main() {
+    public void main() throws InterruptedException {
         if (PCJ.threadCount() != 2) {
             return;
         }
@@ -60,6 +60,9 @@ public class PingPongRev implements StartPoint {
         final int number_of_tests = 5;
 
         for (int j = transmit.length - 1; j >= 0; j--) {
+            System.gc();
+            Thread.sleep(1000);
+
             int n = transmit[j];
             if (PCJ.myId() == 0) {
                 System.err.println("n=" + n);
