@@ -60,6 +60,8 @@ public class MainArgs {
                 return org.pcj.tests.micro.Barrier.class;
             case "Broadcast":
                 return org.pcj.tests.micro.Broadcast.class;
+            case "Reduce":
+                return org.pcj.tests.micro.Reduce.class;
             case "PiInt":
                 return org.pcj.tests.app.pi.PiInt.class;
             case "PiMC":

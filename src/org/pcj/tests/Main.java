@@ -36,7 +36,7 @@ import org.pcj.PCJ;
 public class Main {
 
     public static void main(String[] args) throws Throwable {
-        try (DumpInfo dumpInfo = new DumpInfo()) {
+//        try (DumpInfo dumpInfo = new DumpInfo()) {
             if (args.length == 0) {
                 System.out.println("<start point> [nodes file] [num nodes]");
                 System.exit(1);
@@ -55,6 +55,6 @@ public class Main {
                 System.err.println("Used nodes: " + Arrays.toString(mainArgs.getNodes()));
                 throw ex;
             }
-        }
+//        }
     }
 }

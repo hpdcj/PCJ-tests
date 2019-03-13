@@ -34,13 +34,14 @@ import org.pcj.PCJ;
 public class MainWithDeploy {
 
     public static void main(String[] args) throws Throwable {
-        try (DumpInfo dumpInfo = new DumpInfo()) {
+//        try (DumpInfo dumpInfo = new DumpInfo()) {
 //        args = new String[]{"EasyTest"};
 //        args = new String[]{"PiInt"};
 //        args = new String[]{"PiMC"};
 //        args = new String[]{"Barrier"};
 //        args = new String[]{"Broadcast"};
 //        args = new String[]{"BroadcastRev"};
+//        args = new String[]{"Reduce"};
 //        args = new String[]{"PingPong"};
 //        args = new String[]{"RayTracerA"};
 //        args = new String[]{"RayTracerB"};
@@ -64,6 +65,6 @@ public class MainWithDeploy {
             }
 
             PCJ.deploy(mainArgs.getStartPoint(), new NodesDescription(mainArgs.getNodes()));
-        }
+//        }
     }
 }
