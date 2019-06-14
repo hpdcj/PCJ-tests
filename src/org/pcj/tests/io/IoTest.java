@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
-import org.pcj.NodesDescription;
 import org.pcj.PCJ;
 import org.pcj.RegisterStorage;
 import org.pcj.StartPoint;
@@ -30,7 +29,9 @@ public class IoTest implements StartPoint {
             System.err.println("'" + filename + "': not a file");
             System.exit(1);
         }
-        PCJ.start(IoTest.class, new NodesDescription(nodesFile));
+        PCJ.executionBuilder(IoTest.class)
+                .addNodes(new File(nodesFile))
+                .start();
     }
 
     @Override

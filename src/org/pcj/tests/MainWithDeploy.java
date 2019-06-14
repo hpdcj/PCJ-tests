@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2016, faramir
  * All rights reserved.
  *
@@ -25,7 +25,6 @@
  */
 package org.pcj.tests;
 
-import org.pcj.NodesDescription;
 import org.pcj.PCJ;
 
 /**
@@ -52,19 +51,21 @@ public class MainWithDeploy {
 //        args = new String[]{"MolDynC"};
 //        args = new String[]{"MolDynD"};
 //        args = new String[]{"MolDynE"};
-            if (args.length == 0) {
-                System.out.println("<start point> [nodes file] [num nodes]");
-                System.exit(1);
-            }
+        if (args.length == 0) {
+            System.out.println("<start point> [nodes file] [num nodes]");
+            System.exit(1);
+        }
 
-            MainArgs mainArgs = new MainArgs(args);
+        MainArgs mainArgs = new MainArgs(args);
 
-            if (mainArgs.getStartPoint() == null) {
-                System.err.println("Unknown task: " + args[0]);
-                System.exit(2);
-            }
+        if (mainArgs.getStartPoint() == null) {
+            System.err.println("Unknown task: " + args[0]);
+            System.exit(2);
+        }
 
-            PCJ.deploy(mainArgs.getStartPoint(), new NodesDescription(mainArgs.getNodes()));
+        PCJ.executionBuilder(mainArgs.getStartPoint())
+                .addNodes(mainArgs.getNodes())
+                .deploy();
 //        }
     }
 }

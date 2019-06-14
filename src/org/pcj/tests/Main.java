@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2016, faramir
  * All rights reserved.
  *
@@ -26,35 +26,35 @@
 package org.pcj.tests;
 
 import java.util.Arrays;
-import org.pcj.NodesDescription;
 import org.pcj.PCJ;
 
 /**
- *
  * @author faramir
  */
 public class Main {
 
     public static void main(String[] args) throws Throwable {
 //        try (DumpInfo dumpInfo = new DumpInfo()) {
-            if (args.length == 0) {
-                System.out.println("<start point> [nodes file] [num nodes]");
-                System.exit(1);
-            }
+        if (args.length == 0) {
+            System.out.println("<start point> [nodes file] [num nodes]");
+            System.exit(1);
+        }
 
-            MainArgs mainArgs = new MainArgs(args);
+        MainArgs mainArgs = new MainArgs(args);
 
-            if (mainArgs.getStartPoint() == null) {
-                System.err.println("Unknown task: " + args[0]);
-                System.exit(2);
-            }
+        if (mainArgs.getStartPoint() == null) {
+            System.err.println("Unknown task: " + args[0]);
+            System.exit(2);
+        }
 
-            try {
-                PCJ.start(mainArgs.getStartPoint(), new NodesDescription(mainArgs.getNodes()));
-            } catch (NullPointerException ex) {
-                System.err.println("Used nodes: " + Arrays.toString(mainArgs.getNodes()));
-                throw ex;
-            }
+        try {
+            PCJ.executionBuilder(mainArgs.getStartPoint())
+                    .addNodes(mainArgs.getNodes())
+                    .start();
+        } catch (NullPointerException ex) {
+            System.err.println("Used nodes: " + Arrays.toString(mainArgs.getNodes()));
+            throw ex;
+        }
 //        }
     }
 }

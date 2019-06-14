@@ -5,8 +5,6 @@
  */
 package org.pcj.tests;
 
-import java.io.IOException;
-import org.pcj.NodesDescription;
 import org.pcj.PCJ;
 import org.pcj.StartPoint;
 
