@@ -27,7 +27,6 @@ package org.pcj.tests;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -42,7 +41,7 @@ public class MainArgs {
     private final Class<? extends StartPoint> startPoint;
     private final String[] nodes;
 
-    private String[] readNodes(InputStream is) throws IOException {
+    private String[] readNodes(InputStream is) {
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         return br.lines()
                 .map(String::trim)
@@ -97,9 +96,9 @@ public class MainArgs {
         }
     }
 
-    public MainArgs(String[] args) throws FileNotFoundException, IOException {
+    public MainArgs(String[] args) throws IOException {
         String[] _nodes = null;
-        if (args.length >= 2 && args[1].isEmpty() == false) {
+        if (args.length >= 2 && !args[1].isEmpty()) {
             try (FileInputStream fis = new FileInputStream(args[1])) {
                 _nodes = readNodes(fis);
             } catch (IOException ex) {
