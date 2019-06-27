@@ -91,6 +91,8 @@ public class MainArgs {
                 return org.pcj.tests.micro.BroadcastRev.class;
             case "EasyTest":
                 return org.pcj.tests.EasyTest.class;
+            case "DesDecryption":
+                return org.pcj.tests.app.des.DesDecryption.class;
             default:
                 return org.pcj.tests.HelloWorld.class;
         }

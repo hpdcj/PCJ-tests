@@ -51,6 +51,7 @@ public class MainWithDeploy {
 //        args = new String[]{"MolDynC"};
 //        args = new String[]{"MolDynD"};
 //        args = new String[]{"MolDynE"};
+//        args = new String[]{"DesDecryption"};
         if (args.length == 0) {
             System.out.println("<start point> [nodes file] [num nodes]");
             System.exit(1);
