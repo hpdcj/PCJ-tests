@@ -9,6 +9,8 @@
 //  into SealedObjects.  It represesnts keys as integers (for simplicity).
 //
 ////////////////////////////////////////////////////////////////////////////////
+package org.pcj.tests.app.des;
+
 import javax.crypto.*;
 import javax.crypto.spec.*;
 import java.util.Random;
