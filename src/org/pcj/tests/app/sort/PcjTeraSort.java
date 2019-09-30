@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.pcj.PCJ;
@@ -52,27 +53,32 @@ public class PcjTeraSort implements StartPoint {
 
         int numberOfPivotsByThread = 3;
 
+        long startTime = System.nanoTime();
+
         try (TeraFileInput input = new TeraFileInput(inputFile)) {
             long totalElements = input.length();
+            if (PCJ.myId() == 0) {
+                System.out.printf("Total elements to sort: %d%n", totalElements);
+            }
 
-            long elementsCount = totalElements / PCJ.threadCount();
-            long reminderElements = totalElements - elementsCount * PCJ.threadCount();
+            long localElementsCount = totalElements / PCJ.threadCount();
+            long reminderElements = totalElements - localElementsCount * PCJ.threadCount();
             if (PCJ.myId() < reminderElements) {
-                ++elementsCount;
+                ++localElementsCount;
             }
 
             // every thread read own portion of input file
             long startElement = PCJ.myId() * (totalElements / PCJ.threadCount()) + Math.min(PCJ.myId(), reminderElements);
-            long endElement = startElement + elementsCount;
+            long endElement = startElement + localElementsCount;
 
 //            PCJ.waitFor(Vars.waiter);
-//            System.out.printf("[%d] elements: [%d,%d) %d %n", PCJ.myId(), startElement, endElement, elementsCount);
+//            System.out.printf("[%d] elements: [%d,%d) %d %n", PCJ.myId(), startElement, endElement, localElementsCount);
 //            PCJ.put(true, (PCJ.myId() + 1) % PCJ.threadCount(), Vars.waiter);
 
 
             // generate pivots (a unique set of keys at random positions: k0<k1<k2<...<k(n-1))
             for (int i = 0; i < numberOfPivotsByThread; ++i) {
-                input.seek(startElement + i * (elementsCount / numberOfPivotsByThread));
+                input.seek(startElement + i * (localElementsCount / numberOfPivotsByThread));
                 Element pivot = input.readElement();
                 pivots.add(pivot);
             }
@@ -157,6 +163,11 @@ public class PcjTeraSort implements StartPoint {
         }
         PCJ.put(true, (PCJ.myId() + 1) % PCJ.threadCount(), Vars.waiter);
 
+        if (PCJ.myId() == 0) {
+            PCJ.waitFor(Vars.waiter);
+            long stopTime = System.nanoTime();
+            System.out.printf(Locale.ENGLISH, "Total execution time: %.7f%n", (stopTime - startTime) / 1e9);
+        }
     }
 
     public static class TeraFileOutput implements AutoCloseable {
