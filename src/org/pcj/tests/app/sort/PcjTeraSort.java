@@ -33,15 +33,17 @@ public class PcjTeraSort implements StartPoint {
     private List<Element> pivots = new ArrayList<>();
     private Element[][][] buckets;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        if (args.length < 4) {
+            System.err.println("Parameters: <input-file> <output-file> <pivots-by-thread> <nodes-file>");
+            return;
+        }
         PCJ.executionBuilder(PcjTeraSort.class)
-                .addProperty("inputFile", "input.dat")
-                .addProperty("outputFile", "output.dat")
-                .addProperty("pivotsByThread", "3")
-                .addNode("localhost")
-                .addNode("localhost")
-                .addNode("localhost")
-                .start();
+                .addProperty("inputFile", args[0])
+                .addProperty("outputFile", args[1])
+                .addProperty("pivotsByThread", args[2])
+                .addNodes(new File(args[3]))
+                .deploy();
     }
 
     @Override
