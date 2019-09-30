@@ -35,6 +35,9 @@ public class PcjTeraSort implements StartPoint {
 
     public static void main(String[] args) {
         PCJ.executionBuilder(PcjTeraSort.class)
+                .addProperty("inputFile", "input.dat")
+                .addProperty("outputFile", "output.dat")
+                .addProperty("pivotsByThread", "3")
                 .addNode("localhost")
                 .addNode("localhost")
                 .addNode("localhost")
@@ -47,11 +50,11 @@ public class PcjTeraSort implements StartPoint {
             PCJ.put(true, 0, Vars.waiter);
         }
 
-        String inputFile = "input.dat";
-        String outputFile = "output.dat";
-        new File(outputFile).delete();
+        String inputFile = PCJ.getProperty("inputFile");
+        String outputFile = PCJ.getProperty("outputFile");
+        int numberOfPivotsByThread = Integer.parseInt(PCJ.getProperty("pivotsByThread"));
 
-        int numberOfPivotsByThread = 3;
+        new File(outputFile).delete();
 
         long startTime = System.nanoTime();
 
