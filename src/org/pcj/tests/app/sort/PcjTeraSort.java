@@ -1,6 +1,7 @@
 package org.pcj.tests.app.sort;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -47,6 +48,8 @@ public class PcjTeraSort implements StartPoint {
 
         String inputFile = "input.dat";
         String outputFile = "output.dat";
+        new File(outputFile).delete();
+
         int numberOfPivotsByThread = 3;
 
         try (TeraFileInput input = new TeraFileInput(inputFile)) {
@@ -89,11 +92,7 @@ public class PcjTeraSort implements StartPoint {
 
             PCJ.waitFor(Vars.pivots);
 
-            int totalPivots = pivots.size() + 1;
-            int pivotsCount = totalPivots / PCJ.threadCount();
-            if (PCJ.myId() < totalPivots % PCJ.threadCount()) {
-                ++pivotsCount;
-            }
+            int pivotsCount = ((pivots.size() + 1) + PCJ.threadCount() - (PCJ.myId() + 1)) / PCJ.threadCount();
             buckets = new Element[pivotsCount][PCJ.threadCount()][];
             PCJ.barrier();
 
@@ -148,6 +147,7 @@ public class PcjTeraSort implements StartPoint {
             sortedBuckets[i] = Arrays.stream(buckets[i]).flatMap(Arrays::stream).toArray(Element[]::new);
             Arrays.sort(sortedBuckets[i]);
         }
+//        System.out.println(PCJ.myId() + " " + Arrays.stream(sortedBuckets).mapToInt(a -> a.length).sum());
 
         // save into file
         PCJ.waitFor(Vars.waiter);
