@@ -70,9 +70,9 @@ public class EasyTest implements StartPoint {
         System.out.println("myNode:   " + PCJ.getNodeId());
         System.out.println("numNodes:   " + PCJ.getNodeCount());
 
-        Group g = PCJ.join("group" + (PCJ.myId() % 2));
+        Group g = PCJ.splitGroup((PCJ.myId() % 2),0);
         PCJ.barrier();
-        System.out.println("In group '" + g.getGroupName() + "': " + g.threadCount() + " [groupId:" + g.myId() + "/globalId:" + PCJ.myId() + "]");
+        System.out.println("In group '" + g + "': " + g.threadCount() + " [groupId:" + g.myId() + "/globalId:" + PCJ.myId() + "]");
         if (PCJ.myId() == 0) {
             System.out.println("broadcasting...");
             PCJ.broadcast(0b010101, Shared.A);
@@ -116,7 +116,7 @@ public class EasyTest implements StartPoint {
                     //System.err.println("["+j+"]"+PCJ.myNode()+": sync 0");
                     PCJ.barrier(0);
                     PCJ.put(j, 0, Shared.A);
-                    //System.err.println("["+j+"]"+PCJ.myNode()+": putLocal(A)");
+                    //System.err.println("["+j+"]"+PCJ.myNode()+": localPut(A)");
 
                     //System.err.println("["+j+"]"+PCJ.myNode()+": synced 0");
                 }

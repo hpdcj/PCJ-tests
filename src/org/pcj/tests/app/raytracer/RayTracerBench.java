@@ -271,7 +271,7 @@ public class RayTracerBench {
         if (PCJ.myId() == 0) {
             PCJ.waitFor(Shared.r_checksum, PCJ.threadCount());
             checksum = 0;
-            long[] r_checksum = PCJ.getLocal(Shared.r_checksum);
+            long[] r_checksum = PCJ.localGet(Shared.r_checksum);
             for (long tmp : r_checksum) {
                 checksum += tmp;
             }
@@ -279,7 +279,7 @@ public class RayTracerBench {
              * send temporary copies of p_row back to row
              */
             PCJ.waitFor(Shared.r_p_row, PCJ.threadCount());
-            int[][] r_p_row = PCJ.getLocal(Shared.r_p_row);
+            int[][] r_p_row = PCJ.localGet(Shared.r_p_row);
 
             for (int k = 0; k < PCJ.threadCount(); k++) {
                 p_row = r_p_row[k];
@@ -463,8 +463,8 @@ public class RayTracerBench {
         // set image size
         width = height = datasizes[size];
         if (PCJ.myId() == 0) {
-            PCJ.putLocal(new long[PCJ.threadCount()], Shared.r_checksum);
-            PCJ.putLocal(new int[PCJ.threadCount()][0], Shared.r_p_row);
+            PCJ.localPut(new long[PCJ.threadCount()], Shared.r_checksum);
+            PCJ.localPut(new int[PCJ.threadCount()][0], Shared.r_p_row);
 
             PCJ.monitor(Shared.r_checksum);
             PCJ.monitor(Shared.r_p_row);
@@ -473,7 +473,7 @@ public class RayTracerBench {
         // create the objects to be rendered
         scene = createScene();
 
-        // getLocal lights, objects etc. from scene.
+        // localGet lights, objects etc. from scene.
         setScene(scene);
 
         numobjects = scene.getObjects();

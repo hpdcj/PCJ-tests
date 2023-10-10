@@ -31,7 +31,7 @@ import org.pcj.Storage;
 @RegisterStorage(Reduce.Vars.class)
 public class Reduce implements StartPoint {
 
-    private static final int NUMBER_OF_TESTS = 100;
+    private static final int NUMBER_OF_TESTS = 20;
     private static final int REPEAT_TEST_TIMES = 100;
 
     @Storage(Reduce.class)
@@ -118,6 +118,7 @@ public class Reduce implements StartPoint {
                 new Benchmark("pcjAsyncGet", this::pcjAsyncGet),
                 new Benchmark("pcjPut", this::pcjPut),
                 new Benchmark("pcjTreePut", this::pcjTreePut),
+                new Benchmark("pcjGather", this::pcjGather),
                 new Benchmark("pcjCollect", this::pcjCollect),
                 new Benchmark("pcjReduce", this::pcjReduce),
         };
@@ -197,10 +198,18 @@ public class Reduce implements StartPoint {
         return 0;
     }
 
+    private double pcjGather() {
+        if (PCJ.myId() == 0) {
+            double[] values = PCJ.gather(Vars.value).values().stream().mapToDouble(d -> (double)d).toArray();
+            return Arrays.stream(values).sum();
+        }
+        return 0;
+    }
+
     private double pcjCollect() {
         if (PCJ.myId() == 0) {
-            double[] values = PCJ.collect(Vars.value);
-            return Arrays.stream(values).sum();
+            List<Double> values = PCJ.collect(Collectors::toList, Vars.value);
+            return values.stream().mapToDouble(Double::doubleValue).sum();
         }
         return 0;
     }

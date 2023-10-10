@@ -234,9 +234,9 @@ public class MolDynBench {
                 PCJ.waitFor(Reduce.r_vir, PCJ.threadCount() - 1);
                 PCJ.waitFor(Reduce.r_interactions, PCJ.threadCount() - 1);
 
-                double[] r_epot = PCJ.getLocal(Reduce.r_epot);
-                double[] r_vir = PCJ.getLocal(Reduce.r_vir);
-                long[] r_interactions = PCJ.getLocal(Reduce.r_interactions);
+                double[] r_epot = PCJ.localGet(Reduce.r_epot);
+                double[] r_vir = PCJ.localGet(Reduce.r_vir);
+                long[] r_interactions = PCJ.localGet(Reduce.r_interactions);
                 for (int node = 1; node < PCJ.threadCount(); ++node) {
                     epot += r_epot[node];
                     vir += r_vir[node];
@@ -250,9 +250,9 @@ public class MolDynBench {
                 PCJ.waitFor(Reduce.r_yforce, PCJ.threadCount() - 1);
                 PCJ.waitFor(Reduce.r_zforce, PCJ.threadCount() - 1);
 
-                double[][] r_xforce = PCJ.getLocal(Reduce.r_xforce);
-                double[][] r_yforce = PCJ.getLocal(Reduce.r_yforce);
-                double[][] r_zforce = PCJ.getLocal(Reduce.r_zforce);
+                double[][] r_xforce = PCJ.localGet(Reduce.r_xforce);
+                double[][] r_yforce = PCJ.localGet(Reduce.r_yforce);
+                double[][] r_zforce = PCJ.localGet(Reduce.r_zforce);
 
                 for (int node = 1; node < PCJ.threadCount(); ++node) {
                     for (i = 0; i < mdsize; ++i) {
@@ -270,17 +270,17 @@ public class MolDynBench {
             PCJ.waitFor(Shared.tmp_vir);
             PCJ.waitFor(Shared.tmp_interactions);
 
-            epot = PCJ.getLocal(Shared.tmp_epot);
-            vir = PCJ.getLocal(Shared.tmp_vir);
-            interactions = PCJ.getLocal(Shared.tmp_interactions);
+            epot = PCJ.localGet(Shared.tmp_epot);
+            vir = PCJ.localGet(Shared.tmp_vir);
+            interactions = PCJ.localGet(Shared.tmp_interactions);
 
             PCJ.waitFor(Shared.tmp_xforce);
             PCJ.waitFor(Shared.tmp_yforce);
             PCJ.waitFor(Shared.tmp_zforce);
 
-            tmp_xforce = PCJ.getLocal(Shared.tmp_xforce);
-            tmp_yforce = PCJ.getLocal(Shared.tmp_yforce);
-            tmp_zforce = PCJ.getLocal(Shared.tmp_zforce);
+            tmp_xforce = PCJ.localGet(Shared.tmp_xforce);
+            tmp_yforce = PCJ.localGet(Shared.tmp_yforce);
+            tmp_zforce = PCJ.localGet(Shared.tmp_zforce);
 
             for (i = 0; i < mdsize; i++) {
                 one[i].xforce = tmp_xforce[i];
@@ -338,12 +338,12 @@ public class MolDynBench {
 
     public void JGFinitialise() {
         if (PCJ.myId() == 0) {
-            PCJ.putLocal(new double[PCJ.threadCount()][0], Reduce.r_xforce);
-            PCJ.putLocal(new double[PCJ.threadCount()][0], Reduce.r_yforce);
-            PCJ.putLocal(new double[PCJ.threadCount()][0], Reduce.r_zforce);
-            PCJ.putLocal(new double[PCJ.threadCount()], Reduce.r_epot);
-            PCJ.putLocal(new double[PCJ.threadCount()], Reduce.r_vir);
-            PCJ.putLocal(new long[PCJ.threadCount()], Reduce.r_interactions);
+            PCJ.localPut(new double[PCJ.threadCount()][0], Reduce.r_xforce);
+            PCJ.localPut(new double[PCJ.threadCount()][0], Reduce.r_yforce);
+            PCJ.localPut(new double[PCJ.threadCount()][0], Reduce.r_zforce);
+            PCJ.localPut(new double[PCJ.threadCount()], Reduce.r_epot);
+            PCJ.localPut(new double[PCJ.threadCount()], Reduce.r_vir);
+            PCJ.localPut(new long[PCJ.threadCount()], Reduce.r_interactions);
 
             PCJ.monitor(Reduce.r_xforce);
             PCJ.monitor(Reduce.r_yforce);
